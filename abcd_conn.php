@@ -1,5 +1,5 @@
 <?php
- require_once 'ABCD_etc.php';
+ require_once 'abcd_etc.php';
  require_once 'class.crud.php';
     /*** a new crud object ***/
     $crud = new crud();
