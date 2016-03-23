@@ -60,7 +60,7 @@ $dir = new DirectoryIterator($path);
        alert( "2 User records added" );
      });
 function Process(study) {
-	return $.get(URL + study);
+	return $.get(URL + study + '/code/php/');
 }
 </script>
 </body>
