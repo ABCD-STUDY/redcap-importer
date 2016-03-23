@@ -10,6 +10,15 @@ BODY {
 }
 
 h2 { color: FFF; text-align: center;}
+.strokeme
+{
+    color: white;
+    text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;  
+}
 ul.tabs {
     margin:0px; padding:0px;
 }
@@ -17,6 +26,37 @@ ul.tabs li {
     list-style:none;
     display:inline;
 }
+.button {
+   border-top: 1px solid #96d1f8;
+   background: #65a9d7;
+   background: -webkit-gradient(linear, left top, left bottom, from(#3e779d), to(#65a9d7));
+   background: -webkit-linear-gradient(top, #3e779d, #65a9d7);
+   background: -moz-linear-gradient(top, #3e779d, #65a9d7);
+   background: -ms-linear-gradient(top, #3e779d, #65a9d7);
+   background: -o-linear-gradient(top, #3e779d, #65a9d7);
+   padding: 5px 10px;
+   -webkit-border-radius: 8px;
+   -moz-border-radius: 8px;
+   border-radius: 8px;
+   -webkit-box-shadow: rgba(0,0,0,1) 0 1px 0;
+   -moz-box-shadow: rgba(0,0,0,1) 0 1px 0;
+   box-shadow: rgba(0,0,0,1) 0 1px 0;
+   text-shadow: rgba(0,0,0,.4) 0 1px 0;
+   color: white;
+   font-size: 14px;
+   font-family: Georgia, serif;
+   text-decoration: none;
+   vertical-align: middle;
+   }
+.button:hover {
+   border-top-color: #28597a;
+   background: #28597a;
+   color: #ccc;
+   }
+.button:active {
+   border-top-color: #1b435e;
+   background: #1b435e;
+   }
 A {
 	color: #B03060;
 	text-decoration: none;
@@ -29,7 +69,7 @@ A:VISITED {
 }
 A:HOVER {
 	color: #FFCC99;
-	text-decoration: underline;
+	text-decoration: none;
 }
 
 TABLE {BORDER-COLLAPSE: collapse;}
@@ -39,7 +79,7 @@ TABLE {BORDER-COLLAPSE: collapse;}
 }
 #tabbed_box {
     margin: 10px auto 0px auto;
-    width:300px;
+    width:200px;
 }
 .tabbed_area {
     border:4px solid #494e52;
@@ -71,5 +111,7 @@ TABLE {BORDER-COLLAPSE: collapse;}
      width: 50%;
      align: left;
   }
-
+.content {
+    margin: 8px; padding-bottom: 8px;
+}
 
