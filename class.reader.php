@@ -1,50 +1,53 @@
 <?php
 /** 
-* Reader - Reads and writes from JSON file to Redcap DB
+* Reader - Processes file json data
 *
 *  Author: James Hudnall
 *  Version 1.0 
 *  
 */
 class Reader {
-/* Parse data from file */
-     function Parser($source) {
-        if (file_exists ($source)) {
-        $rh = fopen($source, 'r');
-        if ($rh===false) {
-        // error reading or opening file
-        echo "Fail: " . $rh;
-           return true;
-        }
-        while (!feof($rh)) {
-            if ($contents = fread($rh, filesize($source)) != FALSE) {
-                   echo 'CODE: ' . json_decode($contents);
-                   $this->Process($contents);
-                   // 'Download error: Cannot write to file ('.$file_target.')';
-                   return true;
-               }
-        }
-        fclose($rh);
-        // No error
-        } else {
-            echo 'File Not Found: ' . $source . '<br/>';
-        }
-        return false;
+/* 
+* Parser
+* This method is for Parsing data from file 
+*
+* @param string $source - file path to source file
+*/
+   function Parser($source) {
+        $form = json_decode(file_get_contents($source), true);
+			if (is_array($form)){
+                $a = 0;
+ 
+                //print_r($form);echo '<br/><hl>';
+                foreach ( $form as $f ) {
+				foreach ($f as $key=>$data){
+                    $this->Process($key,$data);
+				}
+         
+                }
+			} else {
+                echo 'NO DATA PRESENT';
+            }
      }
-    /* process data pulled */
-    function Process($row) {
-        var_dump(json_decode($row));
-
+/* 
+* Process
+* Writes data passed to it to the database 
+*
+* @param string $key - Field Name being Passed
+* @param string $data - Data value passed
+*/
+    function Process($key,$data) {
+       require_once 'class.crud.php';
+       $crud = new crud();
         $values = array(
          array(
-    'Field'=>addslashes($Field),    
-    'Data'=>addslashes($Data)
+    'Field'=>addslashes($key),    
+    'Data'=>addslashes($data)
     ));
 
     /*** insert the array of values ***/
     $crud->dbInsert('formdata', $values);
-	 header("location:". ABCD_HOST);
-        return true;
+    return true;
     }
  }
 ?>
