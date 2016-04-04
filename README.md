@@ -6,7 +6,7 @@
  <p>turn.php - cron job that will process files and import data
  <p>class.reader.php - Class to process JSON files and convert them to MySql</p>
  
- Deprecated code below no longer relebany
+ Deprecated code below no longer relevant
 
  <p>abcd_conn.php - Database Connection Class</p>
  <p>abcd_etc.php - Constants defined for use in system</p>
