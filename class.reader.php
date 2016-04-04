@@ -7,53 +7,27 @@
  *
  */
 class Reader {
-    /*
-     * Array_Depth
-     * Find Array Depth
-     */
-    function array_depth($array, $childrenkey = 0) {
-        $max_depth = 1;
-
-        if (!empty($array[$childrenkey])) {
-            foreach($array[$childrenkey] as $value) {
-                if (is_array($value)) {
-                    $depth = array_depth($value, $childrenkey) + 1;
-
-                    if ($depth > $max_depth) {
-                        $max_depth = $depth;
-                    }
-                }
-            }
-        }
-
-        return $max_depth;
-    }
     /* 
      * Parser
      * This method is for Parsing data from file
      *
      * @param string $source - file path to source file
      */
-    function Parser($source, $token) {
-        $ln = '';
-        $out = '';
-        $crud = new database(H, U, P, D);
+    function Parser($source) {
         $form = json_decode(file_get_contents($source), true);
         if (is_array($form)) {
             foreach($form as $f) {
                 $dpth = count($f);
                 if ($dpth > 1) {
                     foreach($f as $fs) {
-                        foreach($fs as $key => $data) {
+                       $this->Import($fs);
+                      //  foreach($fs as $key => $data) {
                             // $this->Process($key,$data);
-                            $out .= '['.$key.']['.$data.']';
-                            $ln .= '['.$key.']['.$data.']';
-                            //$values = array(array('field' => addslashes($key), 'data' => addslashes($data)));
-                            //$crud->insert('formdata', array($key), array('field'));
-                        }
-                        $this->ImportData($ln, $token)
-                        //echo $ln.'<br/>';
-                        $ln = '';
+                           // $line .= '['.$key.']['.$data.']';
+                            //echo($line);
+                        //}
+                       // $this->Import($line);
+                        //unset($line);
                     }
                 }
             }
@@ -94,7 +68,7 @@ class Reader {
 
         $ch = curl_init();
 
-        curl_setopt($ch, CURLOPT_URL, $GLOBALS['api_url']);
+        curl_setopt($ch, CURLOPT_URL, $this->_apiurl);
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($fields, '', '&'));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE); // Set to TRUE for production use
@@ -106,7 +80,26 @@ class Reader {
         curl_setopt($ch, CURLOPT_FRESH_CONNECT, 1);
 
         $output = curl_exec($ch);
-        // print $output;
+        print $output;
+        curl_close($ch);
+
+    }
+
+    function Import($line) {
+
+        $data = json_encode($line);
+
+        $fields = array('token' => $GLOBALS['api_token'], 'content' => 'record', 'format' => 'json', 'type' => 'flat', 'data' => $data, );
+
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL, $GLOBALS['api_url']);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($fields));
+
+        $output = curl_exec($ch);
+        print $output;
         curl_close($ch);
 
     }
