@@ -1,7 +1,7 @@
 <?php
 /*
 *  Turn Cron
-*  Cron Looks for recent files and processes them
+*  Looks for recent files and processes them
 *  Author: James Hudnall
 *  (c) 2016 - ABCD UCSD
 */
@@ -18,10 +18,12 @@ foreach ($iterator as $fileinfo) {
         if ($fileinfo->getMTime() > $latestTime) {
             $latestTime = $fileinfo->getMTime();
             $newFile = $fileinfo->getFilename();
-            //print $newFile . " - " . date( "Y/m/d", $latestTime); 
         }
     }
 }
 $source = $Path . $newFile;
 $read = new Reader();
-$data = $read->Parser($source);
+if ($read->Parser($source)) {
+    rename($source, $Path . '/read/$newFile');   // move file if successfully processed
+}
+
