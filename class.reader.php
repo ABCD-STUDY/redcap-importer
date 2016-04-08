@@ -37,13 +37,13 @@ class Reader {
      */
     function Import($line) {
 
-        $data = json_encode($line);
-        echo var_dump($data) . '<br/>';
+        $record = json_encode($line);
+        //echo var_dump($record) . '<br/>';
         /* $fields = array('token' => $GLOBALS['api_token'], 'content' => 'record', 'format' => 'json', 'type' => 'flat', 'data' => $data, );
         */
-        $data = array('token' => '30B362C7B18DEC4BF8E9E395C2EBD39B', 'content' => 'record', 'format' => 'json', 'type' => 'flat', 'overwriteBehavior' => 'normal', 'data' => $line, 'returnContent' => 'count', 'returnFormat' => 'json');
+        $data = array('token' => $GLOBALS['api_token'], 'content' => 'record', 'format' => 'json', 'type' => 'flat', 'overwriteBehavior' => 'normal', 'data' => $record, 'returnContent' => 'count', 'returnFormat' => 'json');
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, 'https://abcd-rc.ucsd.edu/redcap/api/');
+        curl_setopt($ch, CURLOPT_URL, $GLOBALS['api_url']);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_VERBOSE, 0);
@@ -53,7 +53,7 @@ class Reader {
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($ch, CURLOPT_FRESH_CONNECT, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data, '', '&'));
-        
+
         if ($output = curl_exec($ch)) {
             print $output . '<br/>';
         } else {
@@ -61,6 +61,5 @@ class Reader {
         }
         curl_close($ch);
     }
-
 }
 ?>
