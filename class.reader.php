@@ -20,7 +20,7 @@ class Reader {
                 $dpth = count($f);
                 if ($dpth > 1) {
                     foreach($f as $fs) {
-                       $this->Import($fs);
+                        $this->Import($fs);
                     }
                 }
             }
@@ -38,20 +38,28 @@ class Reader {
     function Import($line) {
 
         $data = json_encode($line);
-        
-        $fields = array('token' => $GLOBALS['api_token'], 'content' => 'record', 'format' => 'json', 'type' => 'flat', 'data' => $data, );
-
+        echo var_dump($data) . '<br/>';
+        /* $fields = array('token' => $GLOBALS['api_token'], 'content' => 'record', 'format' => 'json', 'type' => 'flat', 'data' => $data, );
+        */
+        $data = array('token' => '30B362C7B18DEC4BF8E9E395C2EBD39B', 'content' => 'record', 'format' => 'json', 'type' => 'flat', 'overwriteBehavior' => 'normal', 'data' => $line, 'returnContent' => 'count', 'returnFormat' => 'json');
         $ch = curl_init();
-
-        curl_setopt($ch, CURLOPT_URL, $GLOBALS['api_url']);
-        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_URL, 'https://abcd-rc.ucsd.edu/redcap/api/');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($fields));
-
-        $output = curl_exec($ch);
-        print $output;
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_VERBOSE, 0);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_AUTOREFERER, true);
+        curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+        curl_setopt($ch, CURLOPT_FRESH_CONNECT, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data, '', '&'));
+        
+        if ($output = curl_exec($ch)) {
+            print $output . '<br/>';
+        } else {
+            echo '<p>FAILED</p>';
+        }
         curl_close($ch);
-
     }
 
 }
