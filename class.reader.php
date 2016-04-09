@@ -13,22 +13,20 @@ class Reader {
      *
      * @param string $source - file path to source file
      */
-    function Parser($source) {
-        $x = 1;
+    function Parser($source, $subject, $event) {
         $form = json_decode(file_get_contents($source), true);
         if (is_array($form)) {
             foreach($form as $f) {
                 $dpth = count($f);
                 if ($dpth > 1) {
                     foreach($f as $fs) {
-                        $fs['record_id'] = 'NDAR' . $x++;
-                        $fs['redcap_event_name'] = 'baseline_arm_1';
-                        $fs['little_man_task_complete'] = '0';
+                        $fs['record_id'] = $subject;
+                        $fs['redcap_event_name'] = $event;
+                        $fs['little_man_task_complete'] = '0'; // may need to make this flexible for other tasks
                         $this->Import($fs);
                     }
                 }
             }
-            ECHO 'Finished';
         } else {
             echo 'NO DATA PRESENT';
         }
@@ -43,7 +41,7 @@ class Reader {
 
         $rec = json_encode($line);
         $record = '['. $rec. ']';
-        echo $record . '<br/><font style="color:blue">Redcap:</font><span  style="color:red">  ';
+        //echo $record . '<br/><font style="color:blue">Redcap:</font><span  style="color:red">  ';
 
         $ch = curl_init();
 
