@@ -14,12 +14,16 @@ class Reader {
      * @param string $source - file path to source file
      */
     function Parser($source) {
+        $x = 1;
         $form = json_decode(file_get_contents($source), true);
         if (is_array($form)) {
             foreach($form as $f) {
                 $dpth = count($f);
                 if ($dpth > 1) {
                     foreach($f as $fs) {
+                        $fs['record_id'] = 'NDAR' . $x++;
+                        $fs['redcap_event_name'] = 'baseline_arm_1';
+                        $fs['little_man_task_complete'] = '0';
                         $this->Import($fs);
                     }
                 }
@@ -37,12 +41,15 @@ class Reader {
      */
     function Import($line) {
 
-        $record = json_encode($line);
-        //echo var_dump($record) . '<br/>';
-        /* $fields = array('token' => $GLOBALS['api_token'], 'content' => 'record', 'format' => 'json', 'type' => 'flat', 'data' => $data, );
-        */
-        $data = array('token' => $GLOBALS['api_token'], 'content' => 'record', 'format' => 'json', 'type' => 'flat', 'overwriteBehavior' => 'normal', 'data' => $record, 'returnContent' => 'count', 'returnFormat' => 'json');
+        $rec = json_encode($line);
+        $record = '['. $rec. ']';
+        echo $record . '<br/><font style="color:blue">Redcap:</font><span  style="color:red">  ';
+
         $ch = curl_init();
+
+        
+        $data = array('token' => $GLOBALS['api_token'], 'content' => 'record', 'format' => 'json', 'type' => 'flat', 'overwriteBehavior' => 'normal', 'data' => $record, 'returnContent' => 'count', 'returnFormat' => 'json');
+
         curl_setopt($ch, CURLOPT_URL, $GLOBALS['api_url']);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -54,8 +61,9 @@ class Reader {
         curl_setopt($ch, CURLOPT_FRESH_CONNECT, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data, '', '&'));
 
+
         if ($output = curl_exec($ch)) {
-            print $output . '<br/>';
+            print $output.'</span><p>';
         } else {
             echo '<p>FAILED</p>';
         }
