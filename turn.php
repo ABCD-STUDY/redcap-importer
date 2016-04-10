@@ -23,8 +23,7 @@ foreach ($iterator as $fileinfo) {
 }
 $source = $Path . $newFile;
 // split the subject and event from the name 
-$c = preg_split('/[_.]/i', $newFile, -1, PREG_SPLIT_OFFSET_CAPTURE);
-print_r($c);
+$c = preg_split('/[_.]/i', $newFile, -1, PREG_SPLIT_DELIM_CAPTURE);
 $event = $c[0];
 $subject = $c[1];
 $read = new Reader();
