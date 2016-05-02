@@ -22,9 +22,11 @@ class Reader {
                     foreach($f as $fs) {
                         $fs['record_id'] = $subject;
                         $fs['redcap_event_name'] = $event;
-                        $fs['little_man_task_complete'] = '0'; // may need to make this flexible for other tasks
-                        $this->Import($fs);
+                        $fs['little_man_task_complete'] = '0';
+                        // $this->Import($fs);
                     }
+                } else {
+                    var_dump($fs);
                 }
             }
         } else {
@@ -40,12 +42,10 @@ class Reader {
     function Import($line) {
 
         $rec = json_encode($line);
-        $record = '['. $rec. ']';
-        //echo $record . '<br/><font style="color:blue">Redcap:</font><span  style="color:red">  ';
+        $record = '['.$rec.']';
+        echo $record.'<br/><font style="color:blue">Redcap:</font><span  style="color:red">  ';
 
         $ch = curl_init();
-
-        
         $data = array('token' => $GLOBALS['api_token'], 'content' => 'record', 'format' => 'json', 'type' => 'flat', 'overwriteBehavior' => 'normal', 'data' => $record, 'returnContent' => 'count', 'returnFormat' => 'json');
 
         curl_setopt($ch, CURLOPT_URL, $GLOBALS['api_url']);
@@ -64,6 +64,31 @@ class Reader {
             print $output.'</span><p>';
         } else {
             echo '<p>FAILED</p>';
+        }
+        curl_close($ch);
+
+    }
+    /**
+     *  Export
+     *  Method to determine status of data before sending to avoid duplication
+     *
+     **/
+    function Export($recordID) { 
+        $data = array('token' => $GLOBALS['api_token'], 'content' => 'record', 'format' => 'json', 'type' => 'flat', 'rawOrLabel' => 'raw', 'rawOrLabelHeaders' => 'raw', 'exportCheckboxLabel' => 'false', 'exportSurveyFields' => 'false', 'exportDataAccessGroups' => 'false', 'returnFormat' => 'json');
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $GLOBALS['api_url']);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_VERBOSE, 0);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_AUTOREFERER, true);
+        curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+        curl_setopt($ch, CURLOPT_FRESH_CONNECT, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data, '', '&'));
+        $output = curl_exec($ch);
+        if ($output) {
+            //parse code here
         }
         curl_close($ch);
     }
