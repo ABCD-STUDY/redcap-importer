@@ -7,31 +7,60 @@
  *
  */
 class Reader {
+    /*
+    * Header
+    * Grabs array header info to use in parsing array
+    *
+    */
+    function Header($source) {
+            foreach($source as $f) {
+                //var_dump($source);
+                $dpth = count($f);
+                if ($dpth == 1) {
+                   // foreach($f as $fs){
+                    // load header variables
+                    print_r($f);
+                    //if ($fs['site']) array($head = array('site'=>$fs['site'],'adate'=>$fs['assessmentDate'],'id'=>$fs['subjectid'],'event'=>$fs['event']));
+                   // }
+                }
+        }
+       // var_dump($head);
+        return $head;
+    }
     /* 
      * Parser
      * This method is for Parsing data from file
      *
      * @param string $source - file path to source file
      */
-    function Parser($source, $subject, $event) {
+    function Parser($source, $head) {
         $form = json_decode(file_get_contents($source), true);
         if (is_array($form)) {
+            $head = $this->Header($form); // get header info
             foreach($form as $f) {
                 $dpth = count($f);
+                $x=0;
                 if ($dpth > 1) {
                     foreach($f as $fs) {
-                        $fs['record_id'] = $subject;
-                        $fs['redcap_event_name'] = $event;
+                        // put each line in the table as a row for excel
+                        foreach($fs as $key => $item) {
+                             $fs[$key.'_'.$x] = $item; // add new key and value 
+                             unset($fs[$key]); // drops the old key and value
+                        }
+                        $x++;
+                        $fs['record_id'] = $head['id'];
+                        $fs['redcap_event_name'] = $head['event'];
+                        $fs['assessmentDate'] = $head['adate'];
+                        $fs['site'] = $head['site'];
                         $fs['little_man_task_complete'] = '0';
                         // $this->Import($fs);
                     }
-                } else {
-                    var_dump($fs);
                 }
             }
         } else {
             echo 'NO DATA PRESENT';
         }
+        
     }
 
     /*
@@ -87,10 +116,10 @@ class Reader {
         curl_setopt($ch, CURLOPT_FRESH_CONNECT, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data, '', '&'));
         $output = curl_exec($ch);
-        if ($output) {
-            //parse code here
-        }
+        print $output;
         curl_close($ch);
+
+
     }
 }
 ?>
