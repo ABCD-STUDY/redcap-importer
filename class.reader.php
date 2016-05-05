@@ -12,19 +12,14 @@ class Reader {
     * Grabs array header info to use in parsing array
     *
     */
-    function Header($source) {
-            foreach($source as $f) {
-                //var_dump($source);
-                $dpth = count($f);
-                if ($dpth == 1) {
-                   // foreach($f as $fs){
-                    // load header variables
-                    print_r($f);
-                    //if ($fs['site']) array($head = array('site'=>$fs['site'],'adate'=>$fs['assessmentDate'],'id'=>$fs['subjectid'],'event'=>$fs['event']));
-                   // }
-                }
-        }
-       // var_dump($head);
+    function Header($source=array()) {
+        $head = array('site'=>null,'adate'=>null,'id'=>null,'event'=>null);
+            foreach ($source as $key => $f) {
+                if ($key=='subjectid') $head['id'] = $f;
+                if ($key=='site') $head['site'] = $f;
+                if ($key=='assessmentDate') $head['adate'] = $f;
+                if ($key=='subjectid') $head['event'] = $f;
+            }
         return $head;
     }
     /* 
@@ -33,7 +28,7 @@ class Reader {
      *
      * @param string $source - file path to source file
      */
-    function Parser($source, $head) {
+    function Parser($source) {
         $form = json_decode(file_get_contents($source), true);
         if (is_array($form)) {
             $head = $this->Header($form); // get header info
@@ -53,7 +48,7 @@ class Reader {
                         $fs['assessmentDate'] = $head['adate'];
                         $fs['site'] = $head['site'];
                         $fs['little_man_task_complete'] = '0';
-                        // $this->Import($fs);
+                        $this->Import($fs);
                     }
                 }
             }
