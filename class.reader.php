@@ -8,19 +8,29 @@
  */
 class Reader {
     /*
-    * Header
-    * Grabs array header info to use in parsing array
-    *
-    */
-    function Header($source=array()) {
-        $head = array('site'=>null,'adate'=>null,'id'=>null,'event'=>null);
-            foreach ($source as $key => $f) {
-                if ($key=='subjectid') $head['id'] = $f;
-                if ($key=='site') $head['site'] = $f;
-                if ($key=='assessmentDate') $head['adate'] = $f;
-                if ($key=='subjectid') $head['event'] = $f;
-            }
+     * Header
+     * Returns header info to use in parsing array
+     */
+    function Header($source = array()) {
+        $head = array('site' => null, 'adate' => null, 'id' => null, 'event' => null);
+        foreach($source as $key => $f) {
+            if ($key == 'subjectid') $head['id'] = $f;
+            if ($key == 'site') $head['site'] = $f;
+            if ($key == 'assessmentDate') $head['adate'] = $f;
+            if ($key == 'subjectid') $head['event'] = $f;
+        }
         return $head;
+    }
+    /*
+     * GetSite
+     * Returns the Site name from the file
+     */
+    function GetSite($source = array()) {
+        $file = json_decode(file_get_contents($source), true);
+        foreach($file as $key => $f) {
+            if ($key == 'site') $site = $f;
+        }
+        return $site;
     }
     /* 
      * Parser
@@ -34,13 +44,13 @@ class Reader {
             $head = $this->Header($form); // get header info
             foreach($form as $f) {
                 $dpth = count($f);
-                $x=0;
+                $x = 0;
                 if ($dpth > 1) {
                     foreach($f as $fs) {
                         // put each line in the table as a row for excel
                         foreach($fs as $key => $item) {
-                             $fs[$key.'_'.$x] = $item; // add new key and value 
-                             unset($fs[$key]); // drops the old key and value
+                            $fs[$key.'_'.$x] = $item; // add new key and value 
+                            unset($fs[$key]); // drops the old key and value
                         }
                         $x++;
                         $fs['record_id'] = $head['id'];
@@ -55,7 +65,7 @@ class Reader {
         } else {
             echo 'NO DATA PRESENT';
         }
-        
+
     }
 
     /*
@@ -97,7 +107,7 @@ class Reader {
      *  Method to determine status of data before sending to avoid duplication
      *
      **/
-    function Export($recordID) { 
+    function Export($recordID) {
         $data = array('token' => $GLOBALS['api_token'], 'content' => 'record', 'format' => 'json', 'type' => 'flat', 'rawOrLabel' => 'raw', 'rawOrLabelHeaders' => 'raw', 'exportCheckboxLabel' => 'false', 'exportSurveyFields' => 'false', 'exportDataAccessGroups' => 'false', 'returnFormat' => 'json');
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $GLOBALS['api_url']);
