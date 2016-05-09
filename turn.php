@@ -28,6 +28,9 @@ $event = $c[0];
 $subject = $c[1];
 $read = new Reader();
 if ($read->Parser($source,$subject, $event)) {
-   // rename($source, $Path . '/read/$newFile');   // move file if successfully processed
+    $site = $read->GetSite($source);
+    rename($source, $Path . '/archive/$site/$newFile');   // move file if successfully processed
+} else {
+    rename($source, $Path . '/error/$site/$newFile');   // move file on errors
 }
 
