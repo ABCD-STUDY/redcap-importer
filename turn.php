@@ -32,12 +32,10 @@ if ($read->Parser($source,$subject, $event)) {
     $site = $read->GetSite($source);
     $dir = $Path . '/archive/$site/';
    if( !is_dir($dir)) mkdir($dir, 0777, true);
-      rename($source, $Path . '/archive/$site/$newFile');   // move file if successfully processed
-
-
+      rename($source, $Path . '/archive/' . $site . '/' . $newFile);   // move file if successfully processed
 } else {
      $dir = $Path . '/error/$site/';
      if( !is_dir($dir)) mkdir($dir, 0777, true);
-    rename($source, $Path . '/error/$site/$newFile');   // move file on errors
+    rename($source, $Path . '/error/' . $site . '/' . $newFile);   // move file on errors
 }
 
