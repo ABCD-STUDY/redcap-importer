@@ -10,6 +10,7 @@ ini_set("display_errors", 1);
 require_once 'code/php/config.php';
 require_once 'code/php/class.reader.php';
 $Path = $_SERVER["DOCUMENT_ROOT"] .'/applications/little-man-task/code/sites/';
+
 $latestTime = 0;
 
 $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($Path), RecursiveIteratorIterator::CHILD_FIRST);
@@ -29,8 +30,14 @@ $subject = $c[1];
 $read = new Reader();
 if ($read->Parser($source,$subject, $event)) {
     $site = $read->GetSite($source);
-    rename($source, $Path . '/archive/$site/$newFile');   // move file if successfully processed
+    $dir = $Path . '/archive/$site/';
+   if( !is_dir($dir)) mkdir($dir, 0777, true);
+      rename($source, $Path . '/archive/$site/$newFile');   // move file if successfully processed
+
+
 } else {
+     $dir = $Path . '/error/$site/';
+     if( !is_dir($dir)) mkdir($dir, 0777, true);
     rename($source, $Path . '/error/$site/$newFile');   // move file on errors
 }
 
