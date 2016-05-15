@@ -42,7 +42,7 @@ foreach ($iterator as $fileinfo) {
 $source = $Path . $newFile;
 
 // split the subject and event from the name IF there is any file
-if (isset($source)) {
+if (file_exists($source)) {
 	
 	$c = preg_split('/[_.]/i', $newFile, -1, PREG_SPLIT_DELIM_CAPTURE);
 	
@@ -54,25 +54,31 @@ if (isset($source)) {
 	
 	$site = $read->GetSite($source);
 	
-	if ($read->Parser($source,$subject, $event)) {
+	if ($log = $read->Parser($source,$subject, $event)) {
 		
 		$dir = $Path . '/archive/' . $site . '/';
 		
 		if( !is_dir($dir)) mkdir($dir, 0777, true);
 		
-		rename($source, $Path . '/archive/' . $site . '/' . $newFile);
+		rename($source, $dir . $newFile);
 		// 		move file if successfully processed
 	}
 	else {
 		
-		$dir = $Path . '/error/$site/';
+		$dir = $Path . '/error/' . $site . '/';
 		
 		if( !is_dir($dir)) mkdir($dir, 0777, true);
-		
-		rename($source, $Path . '/error/' . $site . '/' . $newFile);
+        // create log
+        $out = fopen('error_' . $newFile, "w");
+        fwrite($dir . $out, $log);
+        fclose($out);
+		// move file to errot directory
+		rename($source, $dir . $newFile);
 		// 		move file on errors
 	}
 	
+} else {
+	echo 'No File Found';
 }
 
 
