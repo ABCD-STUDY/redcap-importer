@@ -14,10 +14,10 @@ class Reader {
     function Header($source = array()) {
         $head = array('site' => null, 'adate' => null, 'id' => null, 'event' => null);
         foreach($source as $key => $f) {
-            if ($key == 'subjectid') $head['id'] = $f;
-            if ($key == 'site') $head['site'] = $f;
-            if ($key == 'assessmentDate') $head['adate'] = $f;
-            if ($key == 'subjectid') $head['event'] = $f;
+            if ($key == 'lmt_subjectid') $head['subject'] = $f;
+            if ($key == 'lmt_site') $head['site'] = $f;
+            if ($key == 'lmt_assessmentDate') $head['adate'] = $f;
+            if ($key == 'lmt_session') $head['event'] = $f;
         }
         return $head;
     }
@@ -28,7 +28,7 @@ class Reader {
     function GetSite($source = array()) {
         $file = json_decode(file_get_contents($source), true);
         foreach($file as $key => $f) {
-            if ($key == 'site') $site = $f;
+            if ($key == 'lmt_site') $site = $f;
         }
         return $site;
     }
@@ -44,28 +44,30 @@ class Reader {
             $head = $this->Header($form); // get header info
             foreach($form as $f) {
                 $dpth = count($f);
-                $x = 0;
+                $x = 0; $log = null;
                 if ($dpth > 1) {
                     foreach($f as $fs) {
                         // put each line in the table as a row for excel
                         foreach($fs as $key => $item) {
+                            $x = sprintf('%02d', $x);
                             $fs[$key.'_'.$x] = $item; // add new key and value 
                             unset($fs[$key]); // drops the old key and value
                         }
                         $x++;
-                        $fs['record_id'] = $head['id'];
-                        $fs['redcap_event_name'] = $head['event'];
-                        $fs['assessmentDate'] = $head['adate'];
-                        $fs['site'] = $head['site'];
-                        $fs['little_man_task_complete'] = '0';
-                        $this->Import($fs);
+                        $fs['lmt_subject_id'] = $head['subject'];
+                        $fs['lmt_event_name'] = $head['event'];
+                        $fs['lmt_assessment_date'] = $head['adate'];
+                        $fs['lmt_site'] = $head['site'];
+                        $fs['lmt_complete'] = '0';
+                        $lg = $this->Import($fs);
+                        $log .= $lg;
                     }
                 }
             }
         } else {
             echo 'NO DATA PRESENT';
         }
-
+        return $log;
     }
 
     /*
@@ -100,7 +102,7 @@ class Reader {
             echo '<p>FAILED</p>';
         }
         curl_close($ch);
-
+        return $output;
     }
     /**
      *  Export
