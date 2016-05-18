@@ -14,6 +14,8 @@ class Reader {
     function Header($source = array()) {
         $head = array('site' => null, 'adate' => null, 'id' => null, 'event' => null);
         foreach($source as $key => $f) {
+            if ($key == 'record_id') $head['record_id'] = $f;
+            if ($key == 'redcap_event_name') $head['event_name'] = $f;
             if ($key == 'lmt_subjectid') $head['subject'] = $f;
             if ($key == 'lmt_site') $head['site'] = $f;
             if ($key == 'lmt_assessmentDate') $head['adate'] = $f;
@@ -55,6 +57,8 @@ class Reader {
                             unset($fs[$key]); // drops the old key and value
                         }
                         $x++;
+                        $fs['record_id'] = $head['record_id'];
+                        $fs['redcap_event_name'] = $head['event_name'];
                         $fs['lmt_subject_id'] = $head['subject'];
                         $fs['lmt_event_name'] = $head['event'];
                         $fs['lmt_assessment_date'] = $head['adate'];
@@ -77,7 +81,7 @@ class Reader {
      *
      */
     function Import($line) {
-
+        $log = null;
         $rec = json_encode($line);
         $record = '['.$rec.']';
         //echo $record.'<br/><font style="color:blue">Response:</font>  ';
@@ -99,12 +103,18 @@ class Reader {
 
         if ($output = curl_exec($ch)) {
             $pos = strrpos($output, "error");
-            if ($pos === false) { 
-                 print '<span  style="color:green">'.$output.'</span><p>';
-            } else {
-                $rec = str_replace(",", "<br>", $record);
-                 print $rec.'<br/><span  style="color:red"><b>'.$output.',</b></span><p>';
-                 $log = $record.'<br/><span  style="color:red"><b>'.$output.'</b></span><p>';
+            if ($pos === false) { // show successful responses in green. Strip tags
+                $op  = str_replace("{", "", $output);
+                $op  = str_replace("}", "", $op);
+                $op  = str_replace("\"", "", $op);
+                 print '<span  style="color:green">Success: '.$op.'</span><br/>';
+            } else {   // show failed responses in red. Strip tags
+                $rec = str_replace(",", ",<br>", $record);
+                $op  = str_replace("{", "", $output);
+                $op  = str_replace("}", "", $op);
+                $op  = str_replace("\"", "", $op);
+                 print '<hr>' . $rec . '<br/><span  style="color:red"><b>'.$op.'</b></span></center>';
+                 $log = $record.'<br/><span  style="color:red"><b>'.$op.'</b></span><br/>';
             }
         } else {
             echo '<p>IMPORT FAILED</p>';
