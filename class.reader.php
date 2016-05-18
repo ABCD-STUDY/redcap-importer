@@ -39,12 +39,13 @@ class Reader {
      * @param string $source - file path to source file
      */
     function Parser($source) {
+        $log = null;
         $form = json_decode(file_get_contents($source), true);
         if (is_array($form)) {
             $head = $this->Header($form); // get header info
             foreach($form as $f) {
                 $dpth = count($f);
-                $x = 0; $log = null;
+                $x = 0; 
                 if ($dpth > 1) {
                     foreach($f as $fs) {
                         // put each line in the table as a row for excel
@@ -79,7 +80,7 @@ class Reader {
 
         $rec = json_encode($line);
         $record = '['.$rec.']';
-        echo $record.'<br/><font style="color:blue">Redcap:</font><span  style="color:red">  ';
+        //echo $record.'<br/><font style="color:blue">Response:</font>  ';
 
         $ch = curl_init();
         $data = array('token' => $GLOBALS['api_token'], 'content' => 'record', 'format' => 'json', 'type' => 'flat', 'overwriteBehavior' => 'normal', 'data' => $record, 'returnContent' => 'count', 'returnFormat' => 'json');
@@ -97,12 +98,19 @@ class Reader {
 
 
         if ($output = curl_exec($ch)) {
-            print $output.'</span><p>';
+            $pos = strrpos($output, "error");
+            if ($pos === false) { 
+                 print '<span  style="color:green">'.$output.'</span><p>';
+            } else {
+                $rec = str_replace(",", "<br>", $record);
+                 print $rec.'<br/><span  style="color:red"><b>'.$output.'</b></span><p>';
+                 $log = $record.'<br/><span  style="color:red"><b>'.$output.'</b></span><p>';
+            }
         } else {
-            echo '<p>FAILED</p>';
+            echo '<p>IMPORT FAILED</p>';
         }
         curl_close($ch);
-        return $output;
+        return $log;
     }
     /**
      *  Export
