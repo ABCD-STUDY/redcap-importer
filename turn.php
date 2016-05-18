@@ -41,6 +41,8 @@ foreach ($iterator as $fileinfo) {
 
 $source = $Path . $newFile;
 
+//echo $source . '<p>&nbsp;</p>';
+
 // split the subject and event from the name IF there is any file
 if (file_exists($source)) {
 	
@@ -64,15 +66,15 @@ if (file_exists($source)) {
 		// 		move file if successfully processed
 	}
 	else {
-		
+		echo 'Failed';
 		$dir = $Path . '/error/' . $site . '/';
-		
+		$fl = 'error_' . $newFile;
 		if( !is_dir($dir)) mkdir($dir, 0777, true);
         // create log
-        $out = fopen('error_' . $newFile, "w");
-        fwrite($dir . $out, $log);
+        $out = fopen($fl, "w");
+        fwrite($out, $log);
         fclose($out);
-		// move file to errot directory
+		// move file to error directory
 		rename($source, $dir . $newFile);
 		// 		move file on errors
 	}
