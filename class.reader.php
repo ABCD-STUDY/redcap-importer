@@ -103,7 +103,7 @@ class Reader {
                  print '<span  style="color:green">'.$output.'</span><p>';
             } else {
                 $rec = str_replace(",", "<br>", $record);
-                 print $rec.'<br/><span  style="color:red"><b>'.$output.'</b></span><p>';
+                 print $rec.'<br/><span  style="color:red"><b>'.$output.',</b></span><p>';
                  $log = $record.'<br/><span  style="color:red"><b>'.$output.'</b></span><p>';
             }
         } else {
