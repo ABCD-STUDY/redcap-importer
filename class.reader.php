@@ -72,6 +72,7 @@ class Reader {
         $pz = ($px / 3);
         $x = 0;
         $y = 0;
+        // strip out excess into to get field name from returned 
         while ($y <= $pz) {
             if ($px > $x) $op = str_replace('"original_field_name":"', "", $p[$x]);
             $op = str_replace('"', "", $op);
@@ -111,16 +112,16 @@ class Reader {
                         foreach($fs as $key => $item) {
 
                             $x = sprintf('%02d', $x);
-                            $item = ($key === 'lmt_stimulus') ? htmlspecialchars($item) : $item; // make sure html characters are encoded
+                            $item = ($key === 'lmt_stimulus') ? htmlspecialchars($item) : $item; // make sure html characters are encoded for stimulus
                             $send[$key.'_'.$x] = $item;
                             $k = $key.'_'.$x;
-                            if (!in_array($k, $fields)) print '<br><font style="color:red">Field not Defined: '.$k.'</font><br>'; // field not in instrument
+                            if (!in_array($k, $fields)) print '<br><font style="color: red; font-size: 15pt; font-style: italic;">Field not Defined: '.$k.'</font><br>'; // field not in instrument
                             // 							add new key and value 
                             unset($fs[$key]);
                             // 							drops the old key and value
                         }
                         $x++;
-////////////////////////////////////////////////////////////old space
+                        ///////////////////////////////////// array was previously built
                     }
                 }
             }
@@ -128,7 +129,7 @@ class Reader {
             $send['record_id'] = $head['record_id'];
             $send['lmt_subject_id'] = $head['subject'];
             $send['lmt_event_name'] = $head['event'];
-            $sendfs['redcap_event_name'] = $head['event'];
+            $send['redcap_event_name'] = $head['event'];
             $send['lmt_assessment_date'] = $head['adate'];
             $send['lmt_site'] = $head['site'];
             $send['little_man_task_complete'] = '0';
@@ -146,13 +147,36 @@ class Reader {
      *  Method to communicate with Redcap Server using Token
      *
      */
-
-
-
     function Import($line) {
 
         $log = null;
         $rec = json_encode($line);
+/*
+        $record = '[{"lmt_rt_43":385,
+"lmt_stimulus_43":"images\/32.png",
+"lmt_key_press_43":0,
+"lmt_stimulus_type_43":"left",
+"lmt_trial_type_43":"button-response",
+"lmt_trial_index_43":43,
+"lmt_time_elapsed_43":51359,
+"lmt_internal_node_id_43":"0.0-14.0-62.0",
+"lmt_is_data_element_43":true,
+"lmt_correct_43":true,
+"lmt_rt_44":1434,
+"lmt_key_press_44":"mouse",
+"lmt_trial_type_44":"text",
+"lmt_trial_index_44":44,
+"lmt_time_elapsed_44":54122,
+"lmt_internal_node_id_44":"0.0-15.0",
+"lmt_is_data_element_44":false,
+"record_id":"NDAR01",
+"lmt_subject_id":"HaukeBartsch222",
+"lmt_event_name":"baseline_arm_1",
+"redcap_event_name":"baseline_arm_1",
+"lmt_assessment_date":"2016-05-12T08:28:23-07:00",
+"lmt_site":"UCSD",
+"little_man_task_complete":"0"}]';
+*/
         $record = '['.$rec.']';
 
         //echo $record.'<br/><font style="color:blue">Response:</font>  ';
@@ -178,7 +202,7 @@ class Reader {
             if ($pos === false) {
 
                 // 				show successful responses in green. Strip tags
-                //$rec = str_replace(",", ",<br>", $record);
+                $rec = str_replace(",", ",<br>", $record);
                 // 				make readable
                 $op = str_replace("{", "", $output);
                 $op = str_replace("}", "", $op);
