@@ -9,35 +9,13 @@
 class Reader {
 
     /*
-     * Header
-     * Returns header info to use in parsing array
-     */
-    function Header($source = array()) {
-
-        $head = array('site' => null, 'adate' => null, 'id' => null, 'event' => null);
-
-        foreach($source as $key => $f) {
-
-            if ($key == 'record_id') $head['record_id'] = $f;
-            if ($key == 'redcap_event_name') $head['event_name'] = $f;
-            if ($key == 'lmt_subjectid') $head['subject'] = $f;
-            if ($key == 'lmt_site') $head['site'] = $f;
-            if ($key == 'lmt_assessmentDate') $head['adate'] = $f;
-            if ($key == 'lmt_session') $head['event'] = $f;
-        }
-        return $head;
-    }
-
-    /*
      * GetSite
      * Returns the Site name from the file
      */
 
     function GetSite($source = array()) {
         $file = json_decode(file_get_contents($source), true);
-        foreach($file as $key => $f) {
-            if ($key == 'lmt_site') $site = $f;
-        }
+		$site = $file['lmt_site'];
         return $site;
 
     }
@@ -94,51 +72,36 @@ class Reader {
 
     function Parser($source) {
 
-        $fields = $this->GetFields();
-        $log = null;
-        $form = json_decode(file_get_contents($source), true);
+        $fields = $this->GetFields();  // get data dictionary from redcap
 
-        if (is_array($form)) {
+        $obj = (object) json_decode(file_get_contents($source), true); // cast data to object for processing
+            $log = null;
             $send = array();
-            $head = $this->Header($form);
-            // 			get header info
-            foreach($form as $f) {
-                $dpth = count($f);
-                $x = 0;
-
-                if ($dpth > 1) {
-                    foreach($f as $fs) {
+			$x = 0;
+            // pull data array from object
+			$data = $obj->data;
+           // echo 'COUNT: ' . count($data);
+            while($x < count($data)) {
+              foreach($data[$x] as $key => $item) {
                         // 						put each line in the table as a row for excel
-                        foreach($fs as $key => $item) {
-
-                            $x = sprintf('%02d', $x);
-                            $item = ($key === 'lmt_stimulus') ? htmlspecialchars($item) : $item; // make sure html characters are encoded for stimulus
-                            $send[$key.'_'.$x] = $item;
-                            $k = $key.'_'.$x;
-                            if (!in_array($k, $fields)) print '<br><font style="color: red; font-size: 15pt; font-style: italic;">Field not Defined: '.$k.'</font><br>'; // field not in instrument
-                            // 							add new key and value 
-                            unset($fs[$key]);
-                            // 							drops the old key and value
-                        }
-                        $x++;
-                        ///////////////////////////////////// array was previously built
-                    }
-                }
+                  $x = sprintf('%02d', $x);
+                  $item = ($key === 'lmt_stimulus') ? htmlspecialchars($item) : $item; // make sure html characters are encoded for stimulus
+                  $send[$key.'_'.$x] = $item;
+                  $k = $key.'_'.$x;
+                  if (!in_array($k, $fields)) print '<br><font style="color: red; font-size: 15pt; font-style: italic;">Field not Defined: '.$k.'</font><br>'; // field not in instrument
+              }
+                 $x++;
             }
-            // output assembled array to API for processing
-            $send['record_id'] = $head['record_id'];
-            $send['lmt_subject_id'] = $head['subject'];
-            $send['lmt_event_name'] = $head['event'];
-            $send['redcap_event_name'] = $head['event'];
-            $send['lmt_assessment_date'] = $head['adate'];
-            $send['lmt_site'] = $head['site'];
+            // output assembled array to API for processing. Object header info added at end. 
+            $send['record_id'] = $obj->record_id;
+            $send['lmt_subject_id'] = $obj->lmt_subjectid;
+            $send['lmt_event_name'] = $obj->redcap_event_name;
+            $send['redcap_event_name'] = $obj->redcap_event_name;
+            $send['lmt_assessment_date'] = $obj->lmt_assessmentDate;
+            $send['lmt_site'] = $obj->lmt_site;
             $send['little_man_task_complete'] = '0';
             $lg = $this->Import($send);
             $log .= $lg;
-        } else {
-
-            echo 'NO DATA PRESENT';
-        }
 
         return $log;
     }
@@ -151,32 +114,6 @@ class Reader {
 
         $log = null;
         $rec = json_encode($line);
-/*
-        $record = '[{"lmt_rt_43":385,
-"lmt_stimulus_43":"images\/32.png",
-"lmt_key_press_43":0,
-"lmt_stimulus_type_43":"left",
-"lmt_trial_type_43":"button-response",
-"lmt_trial_index_43":43,
-"lmt_time_elapsed_43":51359,
-"lmt_internal_node_id_43":"0.0-14.0-62.0",
-"lmt_is_data_element_43":true,
-"lmt_correct_43":true,
-"lmt_rt_44":1434,
-"lmt_key_press_44":"mouse",
-"lmt_trial_type_44":"text",
-"lmt_trial_index_44":44,
-"lmt_time_elapsed_44":54122,
-"lmt_internal_node_id_44":"0.0-15.0",
-"lmt_is_data_element_44":false,
-"record_id":"NDAR01",
-"lmt_subject_id":"HaukeBartsch222",
-"lmt_event_name":"baseline_arm_1",
-"redcap_event_name":"baseline_arm_1",
-"lmt_assessment_date":"2016-05-12T08:28:23-07:00",
-"lmt_site":"UCSD",
-"little_man_task_complete":"0"}]';
-*/
         $record = '['.$rec.']';
 
         //echo $record.'<br/><font style="color:blue">Response:</font>  ';
@@ -207,17 +144,17 @@ class Reader {
                 $op = str_replace("{", "", $output);
                 $op = str_replace("}", "", $op);
                 $op = str_replace("\"", "", $op);
-                print '<hr>'.$rec.'<br/><span  style="color:green">Success: '.$op.'</span><br/>';
+                print $rec.'<br/><span  style="color:green">Success: '.$op.'</span><br/>';
             } else {
 
                 // 				show failed responses in red. Strip tags
                 $rec = str_replace(",", ",<br>", $record);
 
                 // 				make readable
-                $op = str_replace("{", "", $output);
-                $op = str_replace("}", "", $op);
+                $op = str_replace("[{", "", $rec);
+                $op = str_replace("}]", "", $op);
                 $op = str_replace("\"", "", $op);
-                print '<hr>'.$rec.'<br/><span  style="color:red"><b>'.$op.'</b></span></center>';
+                print $op.'<br/><span  style="color:red"><b>'.$output.'</b></span></center>';
                 $log = $record.'<br/><span  style="color:red"><b>'.$op.'</b></span><br/>';
             }
         } else {
