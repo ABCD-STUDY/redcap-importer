@@ -14,8 +14,8 @@ class Reader {
      */
 
     function GetSite($source = array()) {
-        $file = json_decode(file_get_contents($source), true);
-		$site = $file['lmt_site'];
+        $obj = (object) json_decode(file_get_contents($source), true);
+		$site = $obj->lmt_site;
         return $site;
 
     }
@@ -47,7 +47,7 @@ class Reader {
         $p = explode(",", $output);
 
         $px = count($p);
-        $pz = ($px / 3);
+        $pz = ($px / 3); // remove excess info by splitting data
         $x = 0;
         $y = 0;
         // strip out excess into to get field name from returned 
@@ -59,7 +59,6 @@ class Reader {
             $flds[$y] = $op;
             $y++;
             $x = ($x + 3);
-            //print $op . ', ';
         }
         return $flds;
     }
@@ -80,7 +79,7 @@ class Reader {
 			$x = 0;
             // pull data array from object
 			$data = $obj->data;
-           // echo 'COUNT: ' . count($data);
+            // process data
             while($x < count($data)) {
               foreach($data[$x] as $key => $item) {
                         // 						put each line in the table as a row for excel
@@ -116,8 +115,6 @@ class Reader {
         $rec = json_encode($line);
         $record = '['.$rec.']';
 
-        //echo $record.'<br/><font style="color:blue">Response:</font>  ';
-
         $ch = curl_init();
 
         $data = array('token' => $GLOBALS['api_token'], 'content' => 'record', 'format' => 'json', 'type' => 'flat', 'overwriteBehavior' => 'normal', 'data' => $record, 'returnContent' => 'count', 'returnFormat' => 'json');
@@ -149,18 +146,14 @@ class Reader {
 
                 // 				show failed responses in red. Strip tags
                 $rec = str_replace(",", ",<br>", $record);
-
+                // echo $record;
                 // 				make readable
                 $op = str_replace("[{", "", $rec);
                 $op = str_replace("}]", "", $op);
                 $op = str_replace("\"", "", $op);
-                print $op.'<br/><span  style="color:red"><b>'.$output.'</b></span></center>';
+                print '<span  style="color:red"><b>'.$output.'</b></span></center><br/>' . $op;
                 $log = $record.'<br/><span  style="color:red"><b>'.$op.'</b></span><br/>';
             }
-        } else {
-
-            echo '<p>IMPORT FAILED</p>';
-
         }
 
         curl_close($ch);
