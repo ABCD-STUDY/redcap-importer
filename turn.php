@@ -16,7 +16,60 @@ $Path = $_SERVER["DOCUMENT_ROOT"] .'/applications/little-man-task/code/sites/';
 */
 # todo: change based on the current user
 
-$api_token = "9560341DB5CD569629990DD4BF8D5947";
+  $offline=FALSE;
+  if( !isset($_SERVER) || !isset($_SERVER["DOCUMENT_ROOT"]) || $_SERVER["DOCUMENT_ROOT"] == "") {
+     $_SERVER["DOCUMENT_ROOT"] = "/var/www/html/";
+     $offline = TRUE;
+     echo("START in offline mode");
+  }
+
+  if ($offline == FALSE) {
+
+    session_start();
+
+    include($_SERVER["DOCUMENT_ROOT"]."/code/php/AC.php");
+    $user_name = check_logged(); /// function checks if we are logged in
+    $admin = false;
+
+    if ($user_name == "") {
+      // user is not logged in
+      return;
+    } else {
+      $admin = true;
+    }
+  
+    $permissions = list_permissions_for_user( $user_name );
+
+    // find the first permission that corresponds to a site
+    // Assumption here is that a user can only add assessment for the first site he has permissions for!
+    $site = "";
+    foreach ($permissions as $per) {
+       $a = explode("Site", $per); // permissions should be structured as "Site<site name>"
+
+       if (count($a) > 0) {
+          $site = $a[1]; 
+  	  break;
+       }
+    }
+    # todo, do this for all site permissions, not just the first one
+    if ($site == "") {
+       echo (json_encode ( array( "message" => "Error: no site assigned to this user" ) ) );
+       return;
+    }
+
+    # use the site to lookup the correct token
+    $tokens = json_decode(file_get_contents('tokens.json'),true);
+    $keys = array_keys($tokens);
+    $token = "";
+    foreach($keys as $k) {
+       if (strtolower($k) == strtolower($site)) {
+         $token = $tokens[$k];
+       }
+    }
+  } else {
+    $token = "9560341DB5CD569629990DD4BF8D5947"; // test token for offline mode
+  }
+$api_token = $token; // "9560341DB5CD569629990DD4BF8D5947";
 $api_url   = "https://abcd-rc.ucsd.edu/redcap/api/";
 
 require_once 'class.reader.php';
