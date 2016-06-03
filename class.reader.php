@@ -19,7 +19,6 @@ class Reader {
         return $site;
         
     }
-
     /**
     *  GetFields
     *  API call to get the fields for the instrument for comparison
@@ -63,7 +62,6 @@ class Reader {
             }
             return $flds;
         }
-
         /*
         * Parser
         * This method is for Parsing data from file
