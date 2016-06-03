@@ -8,8 +8,8 @@
 */
 class Reader {
     
-     var $project = ''; // member variable to indicate what preset should be used to read values
-
+    var $project = ''; // member variable to indicate what preset should be used to read values
+    
     /*
     * GetSite
     * Returns the Site name from the file
@@ -94,15 +94,15 @@ class Reader {
                 foreach($data[$x] as $key => $item) {
                     // 						put each line in the table as a row for excel
                     $x = sprintf('%02d', $x);
-                    $item = ($key === 'lmt_stimulus') ? htmlspecialchars($item) : $item; // make sure html characters are encoded for stimulus
+                    $item = ($key === $this->project.'_stimulus') ? htmlspecialchars($item) : $item; // make sure html characters are encoded for stimulus
                     $send[$key.'_'.$x] = $item;
                     $k = $key.'_'.$x;
                     if (!in_array($k, $fields)) print '<br><font style="color: red; font-size: 15pt; font-style: italic;">Field not Defined: '.$k.'</font><br>'; // field not in instrument
                 }
                 $x++;
             }
-            // output assembled array to API for processing. 
-            $log = $this->Import($send);  
+            // output assembled array to API for processing.
+            $log = $this->Import($send);
             return $log;
         }
         /*
@@ -152,13 +152,13 @@ class Reader {
                     $op = str_replace("[{", "", $rec);
                     $op = str_replace("}]", "", $op);
                     $op = str_replace("\"", "", $op);
-                    print '<span  style="color:red"><b>'.$output.'</b></span></center><br/>'; 
+                    print '<span  style="color:red"><b>'.$output.'</b></span></center><br/>';
                     $log = $record.$op;
                 }
             }
             
             curl_close($ch);
-           
+            
             return $log;
             
         }
