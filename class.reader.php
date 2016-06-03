@@ -8,6 +8,8 @@
 */
 class Reader {
     
+    var $project = ''; // member variable to indicate what preset should be used to read values
+    
     /*
     * GetSite
     * Returns the Site name from the file
@@ -78,11 +80,11 @@ class Reader {
             $send = array();
             $send['id_redcap'] = $obj->record_id;
             $send['record_id'] = $obj->record_id;
-            $send['lmt_subject_id'] = $obj->lmt_subjectid;
-            $send['lmt_event_name'] = $obj->redcap_event_name;
+            $send[$this->project.'_subject_id'] = $obj->lmt_subjectid;
+            $send[$this->project.'_event_name'] = $obj->redcap_event_name;
             $send['redcap_event_name'] = $obj->redcap_event_name;
-            $send['lmt_assessment_date'] = $obj->lmt_assessmentDate;
-            $send['lmt_site'] = $obj->lmt_site;
+            $send[$this->project.'_assessment_date'] = $obj->lmt_assessmentDate;
+            $send[$this->project.'_site'] = $obj->lmt_site;
             $send['little_man_task_complete'] = '0';
             $x = 0;
             // pull data array from object
@@ -92,15 +94,15 @@ class Reader {
                 foreach($data[$x] as $key => $item) {
                     // 						put each line in the table as a row for excel
                     $x = sprintf('%02d', $x);
-                    $item = ($key === 'lmt_stimulus') ? htmlspecialchars($item) : $item; // make sure html characters are encoded for stimulus
+                    $item = ($key === $this->project.'_stimulus') ? htmlspecialchars($item) : $item; // make sure html characters are encoded for stimulus
                     $send[$key.'_'.$x] = $item;
                     $k = $key.'_'.$x;
                     if (!in_array($k, $fields)) print '<br><font style="color: red; font-size: 15pt; font-style: italic;">Field not Defined: '.$k.'</font><br>'; // field not in instrument
                 }
                 $x++;
             }
-            // output assembled array to API for processing. 
-            $log = $this->Import($send);  
+            // output assembled array to API for processing.
+            $log = $this->Import($send);
             return $log;
         }
         /*
@@ -150,13 +152,13 @@ class Reader {
                     $op = str_replace("[{", "", $rec);
                     $op = str_replace("}]", "", $op);
                     $op = str_replace("\"", "", $op);
-                    print '<span  style="color:red"><b>'.$output.'</b></span></center><br/>'; 
+                    print '<span  style="color:red"><b>'.$output.'</b></span></center><br/>';
                     $log = $record.$op;
                 }
             }
             
             curl_close($ch);
-           
+            
             return $log;
             
         }
