@@ -8,6 +8,8 @@
  */
 class Reader {
 
+    var $project = ''; // member variable to indicate what preset should be used to read values
+
     /*
      * Header
      * Returns header info to use in parsing array
@@ -18,12 +20,12 @@ class Reader {
 
         foreach($source as $key => $f) {
 
-            if ($key == 'record_id') $head['record_id'] = $f;
+//            if ($key == 'record_id') $head['record_id'] = $f;
             if ($key == 'redcap_event_name') $head['event_name'] = $f;
-            if ($key == 'lmt_subjectid') $head['subject'] = $f;
-            if ($key == 'lmt_site') $head['site'] = $f;
-            if ($key == 'lmt_assessmentDate') $head['adate'] = $f;
-            if ($key == 'lmt_session') $head['event'] = $f;
+            if ($key == $this->project.'_subjectid') $head['subject'] = $f;
+            if ($key == $this->project.'_site') $head['site'] = $f;
+            if ($key == $this->project.'_assessmentDate') $head['adate'] = $f;
+            if ($key == $this->project.'_session') $head['event'] = $f;
         }
         return $head;
     }
@@ -35,12 +37,26 @@ class Reader {
 
     function GetSite($source = array()) {
         $file = json_decode(file_get_contents($source), true);
+	$info = array( "", "", "");
         foreach($file as $key => $f) {
-            if ($key == 'lmt_site') $site = $f;
+            if ($key == $this->project.'_site')
+	       $info[0] = $f;
+            if ($key == $this->project.'_event')
+	       $info[1] = $f;
+            if ($key == $this->project.'_subject')
+	       $info[2] = $f;
         }
-        return $site;
-
+        return $info;
     }
+
+    /*
+     * setProject
+     * Set the project name for variables in the data
+     */
+    function setProject( $name ) {
+       $this->project = $name;
+    }
+
     /**
      *  GetFields
      *  API call to get the fields for the instrument for comparison
@@ -52,7 +68,7 @@ class Reader {
 
         $ch = curl_init();
 
-        curl_setopt($ch, CURLOPT_URL, 'https://abcd-rc.ucsd.edu/redcap/api/');
+        curl_setopt($ch, CURLOPT_URL, $GLOBALS['api_url']); // 'https://abcd-rc.ucsd.edu/redcap/api/');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_VERBOSE, 0);
@@ -96,13 +112,39 @@ class Reader {
 
         $fields = $this->GetFields();
         $log = null;
+	//echo("ERROR?: " .$source);
         $form = json_decode(file_get_contents($source), true);
+	
+	echo("\n\nRead source ". $source . " found : ". is_array($form)." of length: ". count($form)."\n\n");
+
+        //$k = array_keys($form);
+	//print_r($k);
+	//print_r($form['data'][0]);
 
         if (is_array($form)) {
             $send = array();
-            $head = $this->Header($form);
-            // 			get header info
-            foreach($form as $f) {
+            $head = $this->Header($form);  // get header info
+	    $counter = 1;
+            foreach($form['data'] as $f) { // get each group in turn
+	        $k = array_keys($f);
+		// print_r($k);
+
+		for ($i = 0; $i < count($k); $i++) {
+                   $x = sprintf('%02d', $counter);
+		   $keyForRedcap = $k[$i].'_'.$x;
+		   if (!in_array($keyForRedcap, $fields)) {
+		      print '<br><font style="color: red; font-size: 15pt; font-style: italic;">Field not Defined: '.$keyForRedcap.'</font><br>'."\n";
+		   } else {
+		      $v = $f[$k[$i]];
+		      if ($k[$i] == $this->project.'stimulus') {
+		        $v = htmlspecialchars($f[$k[$i]]);
+		      }
+  		      $send[$keyForRedcap] = $v;
+		   }
+		}
+		$counter = $counter + 1;
+
+		/*		
                 $dpth = count($f);
                 $x = 0;
 
@@ -112,7 +154,7 @@ class Reader {
                         foreach($fs as $key => $item) {
 
                             $x = sprintf('%02d', $x);
-                            $item = ($key === 'lmt_stimulus') ? htmlspecialchars($item) : $item; // make sure html characters are encoded for stimulus
+                            $item = ($key === $this->project .'stimulus') ? htmlspecialchars($item) : $item; // make sure html characters are encoded for stimulus
                             $send[$key.'_'.$x] = $item;
                             $k = $key.'_'.$x;
                             if (!in_array($k, $fields)) print '<br><font style="color: red; font-size: 15pt; font-style: italic;">Field not Defined: '.$k.'</font><br>'; // field not in instrument
@@ -123,23 +165,20 @@ class Reader {
                         $x++;
                         ///////////////////////////////////// array was previously built
                     }
-                }
+                } */
             }
             // output assembled array to API for processing
-            $send['record_id'] = $head['record_id'];
-            $send['lmt_subject_id'] = $head['subject'];
-            $send['lmt_event_name'] = $head['event'];
+            $send['record_id'] = $head['subject'];
+            $send[$this->project.'_subject_id'] = $head['subject'];
+            $send[$this->project.'_event_name'] = $head['event'];
             $send['redcap_event_name'] = $head['event'];
-            $send['lmt_assessment_date'] = $head['adate'];
-            $send['lmt_site'] = $head['site'];
-            $send['little_man_task_complete'] = '0';
+            $send[$this->project.'_assessment_date'] = $head['adate'];
+            $send[$this->project.'_site'] = $head['site'];
+            //$send['little_man_task_complete'] = '0';
             $lg = $this->Import($send);
-            $log .= $lg;
-        } else {
-
-            echo 'NO DATA PRESENT';
+            $log .= $log . $lg;
         }
-
+	
         return $log;
     }
     /*
@@ -151,39 +190,25 @@ class Reader {
 
         $log = null;
         $rec = json_encode($line);
-/*
-        $record = '[{"lmt_rt_43":385,
-"lmt_stimulus_43":"images\/32.png",
-"lmt_key_press_43":0,
-"lmt_stimulus_type_43":"left",
-"lmt_trial_type_43":"button-response",
-"lmt_trial_index_43":43,
-"lmt_time_elapsed_43":51359,
-"lmt_internal_node_id_43":"0.0-14.0-62.0",
-"lmt_is_data_element_43":true,
-"lmt_correct_43":true,
-"lmt_rt_44":1434,
-"lmt_key_press_44":"mouse",
-"lmt_trial_type_44":"text",
-"lmt_trial_index_44":44,
-"lmt_time_elapsed_44":54122,
-"lmt_internal_node_id_44":"0.0-15.0",
-"lmt_is_data_element_44":false,
-"record_id":"NDAR01",
-"lmt_subject_id":"HaukeBartsch222",
-"lmt_event_name":"baseline_arm_1",
-"redcap_event_name":"baseline_arm_1",
-"lmt_assessment_date":"2016-05-12T08:28:23-07:00",
-"lmt_site":"UCSD",
-"little_man_task_complete":"0"}]';
-*/
+	//$rec = "[{ \"record_id\": \"NDARAB123CDE\" }]";
         $record = '['.$rec.']';
+        //echo "SEND TO REDCAP:" ."\n\n".$record."\n\n";
 
         //echo $record.'<br/><font style="color:blue">Response:</font>  ';
 
         $ch = curl_init();
 
-        $data = array('token' => $GLOBALS['api_token'], 'content' => 'record', 'format' => 'json', 'type' => 'flat', 'overwriteBehavior' => 'normal', 'data' => $record, 'returnContent' => 'count', 'returnFormat' => 'json');
+        $data = array(
+	      'token' => $GLOBALS['api_token'],
+	      'content' => 'record',
+	      'format' => 'json',
+	      'type' => 'flat', 
+              'overwriteBehavior' => 'normal',
+	      'data' => $record,
+	      'returnFormat' => 'json');
+	//print_r($data);
+        //echo("Use url:\"".$GLOBALS['api_url']."\"\n".http_build_query($data, '', '&')."\n");
+
         curl_setopt($ch, CURLOPT_URL, $GLOBALS['api_url']);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -196,6 +221,11 @@ class Reader {
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data, '', '&'));
 
         if ($output = curl_exec($ch)) {
+
+            //echo(" OUTPUT OF SEND OPERATION\n\n");
+	    //print_r($output);
+            //echo("\n\n OUTPUT OF SEND OPERATION\n\n");
+	    
 
             $pos = strrpos($output, "error");
 
@@ -217,8 +247,10 @@ class Reader {
                 $op = str_replace("{", "", $output);
                 $op = str_replace("}", "", $op);
                 $op = str_replace("\"", "", $op);
-                print '<hr>'.$rec.'<br/><span  style="color:red"><b>'.$op.'</b></span></center>';
-                $log = $record.'<br/><span  style="color:red"><b>'.$op.'</b></span><br/>';
+                //print '<hr>'.$rec.'<br/><span  style="color:red"><b>'.$op.'</b></span></center>';
+                print $op . "\r\n";
+                      
+		$log = $record.'<br/><span  style="color:red"><b>'.$op.'</b></span><br/>';
             }
         } else {
 
