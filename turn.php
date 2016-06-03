@@ -67,7 +67,8 @@ foreach($filestodo as $source) {
                 mkdir($dir, 0777, true);
             }
             $finfo = pathinfo($source);
-            //rename($source, $dir . $newFile);
+	    $pathinfo = pathinfo($source);
+            rename($source, $dir . DIRECTORY_SEPARATOR . $pathinfo['filename'].".".$pathinfo['extension']);
             // 		move file if successfully processed
         }
         else {
@@ -84,6 +85,9 @@ foreach($filestodo as $source) {
             fwrite($dir . $out, $log);
             fclose($out);
             // move file to error directory
+	    $pathinfo = pathinfo($source);
+	    // move into error directory
+            rename($source, $dir . DIRECTORY_SEPARATOR . $pathinfo['filename'].".".$pathinfo['extension']);
             //rename($source, $dir . $newFile);
         }
         
