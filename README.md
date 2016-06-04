@@ -4,7 +4,9 @@
  Code has been simplified into two files with a config file holding API tokens and url info
  
  <p>turn.php - cron job that will process files and import data
- <p>class.reader.php - Class to process JSON files and convert them to MySql</p>
+ <p>class.reader.php - Class to process JSON files and convert import them to Redcap</p>
+  <p>create-ded.php - Creates CSV file that builds instrument for DED</p>
+   <p>create-lmt.php -Creates CSV file that builds instrument for LMT</p>
  
 
 SUMMARY: The data sent to json flat files by forms need to be retrieved and converted to the format of a redcap table. 
