@@ -3,23 +3,24 @@ error_reporting(E_ALL);
 ini_set("display_errors", 1);
 // writes instrument to screen for saving as csv
 $out = '"Variable / Field Name","Form Name","Section Header","Field Type","Field Label","Choices, Calculations, OR Slider Labels","Field Note","Text Validation Type OR Show Slider Number","Text Validation Min","Text Validation Max",Identifier?,"Branching Logic (Show field only if...)","Required Field?","Custom Alignment","Question Number (surveys only)","Matrix Group Name","Matrix Ranking?","Field Annotation"'. PHP_EOL .
+'record_id,delay_discounting,,text,"Record ID",,,,,,,,,,,,,' . PHP_EOL .
 'subject_id,delay_discounting,,text,"Subject ID",,,,,,,,,,,,,' . PHP_EOL .
 'server_date,delay_discounting,,text,"Server Date",,,,,,,,,,,,,' . PHP_EOL .
 'server_time,delay_discounting,,text,"Sserver Time",,,,,,,,,,,,,' . PHP_EOL .
 'site,delay_discounting,,text,"Site",,,,,,,,,,,,,' . PHP_EOL .
 'run,delay_discounting,,text,"Run",,,,,,,,,,,,,' . PHP_EOL .
 'assessment_date,delay_discounting,,text,"Assessment Date",,,,,,,,,,,,,' . PHP_EOL .
-'IP 1 day,delay_discounting,,text,"IP 1 day",,,,,,,,,,,,,' . PHP_EOL .
-'IP 1 week,delay_discounting,,text,"IP 1 week",,,,,,,,,,,,,' . PHP_EOL .
-'IP 1 month,delay_discounting,,text,"IP 1 month",,,,,,,,,,,,,' . PHP_EOL .
-'IP 3 months,delay_discounting,,text,"IP 3 months",,,,,,,,,,,,,' . PHP_EOL .
-'IP 1 year,delay_discounting,,text,"IP 1 year",,,,,,,,,,,,,' . PHP_EOL .
-'IP 5 years,delay_discounting,,text,"IP 5 years",,,,,,,,,,,,,' . PHP_EOL .
+'ip_1_day,delay_discounting,,text,"IP 1 day",,,,,,,,,,,,,' . PHP_EOL .
+'ip_1_week,delay_discounting,,text,"IP 1 week",,,,,,,,,,,,,' . PHP_EOL .
+'ip_1_month,delay_discounting,,text,"IP 1 month",,,,,,,,,,,,,' . PHP_EOL .
+'ip_3_months,delay_discounting,,text,"IP 3 months",,,,,,,,,,,,,' . PHP_EOL .
+'ip_1_year,delay_discounting,,text,"IP 1 year",,,,,,,,,,,,,' . PHP_EOL .
+'ip_5_years,delay_discounting,,text,"IP 5 years",,,,,,,,,,,,,' . PHP_EOL .
 'k,delay_discounting,,text,"K",,,,,,,,,,,,,' . PHP_EOL .
 'logk,delay_discounting,,text,"Log K",,,,,,,,,,,,,' . PHP_EOL .
 'consistency,delay_discounting,,text,"Consistency",,,,,,,,,,,,,' . PHP_EOL .
-'Consistent_resp_check01,delay_discounting,,text,"Consistent resp check 1",,,,,,,,,,,,,' . PHP_EOL .
-'Consistent_resp_check02,delay_discounting,,text,"Consistent resp check 2",,,,,,,,,,,,,' . PHP_EOL .
+'consistent_resp_check01,delay_discounting,,text,"Consistent resp check 1",,,,,,,,,,,,,' . PHP_EOL .
+'consistent_resp_check02,delay_discounting,,text,"Consistent resp check 2",,,,,,,,,,,,,' . PHP_EOL .
 'event_name,delay_discounting,,text,"Event name",,,,,,,,,,,,,' . PHP_EOL;
 
 
@@ -44,7 +45,6 @@ $out .= 'rt_'.$x.',delay_discounting,,text,"Reaction time '.$x.'",,,,,,,,,,,,,' 
 't_'.$x.',delay_discounting,,text,"T '.$x.'",,,,,,,,,,,,,' . PHP_EOL .
 'stim_onset_'.$x.',delay_discounting,,text,"Stim Onset '.$x.'",,,,,,,,,,,,,' . PHP_EOL .
 'now_'.$x.',delay_discounting,,text,"T '.$x.'",,,,,,,,,,,,,' . PHP_EOL .
-'trialnum_'.$x.',delay_discounting,,text,"Correct '.$x.'",,,,,,,,,,,,,' . PHP_EOL .
 'is_data_element_'.$x.',delay_discounting,,text,"Is Data Element '.$x.'",,,,,,,,,,,,,' . PHP_EOL;
 
 
