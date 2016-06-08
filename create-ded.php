@@ -24,28 +24,28 @@ $out = '"Variable / Field Name","Form Name","Section Header","Field Type","Field
 'event_name,delay_discounting,,text,"Event name",,,,,,,,,,,,,' . PHP_EOL;
 
 
-for ($x = 0; $x < 44; $x++) {
+for ($x = 0; $x < 74; $x++) {
     $x = sprintf('%02d', $x);
 
-$out .= 'rt_'.$x.',delay_discounting,,text,"Reaction time '.$x.'",,,,,,,,,,,,,' . PHP_EOL .
-'stimulus_'.$x.',delay_discounting,,text,"Stimulus '.$x.'",,,,,,,,,,,,,' . PHP_EOL.
-'stimulus_type_'.$x.',delay_discounting,,text,"Stimulus Type'.$x.'",,,,,,,,,,,,,' . PHP_EOL.
-'button_pressed_'.$x.',delay_discounting,,text,"Button Pressed '.$x.'",,,,,,,,,,,,,' . PHP_EOL.
-'key_press_'.$x.',delay_discounting,,text,"Button Pressed '.$x.'",,,,,,,,,,,,,' . PHP_EOL. 
-'trial_type_'.$x.',delay_discounting,,text,"Trial Type '.$x.'",,,,,,,,,,,,,' . PHP_EOL. 
-'trial_index_'.$x.',delay_discounting,,text,"Trial Index '.$x.'",,,,,,,,,,,,,' . PHP_EOL. 
-'time_elapsed_'.$x.',delay_discounting,,text,"Time Elapsed '.$x.'",,,,,,,,,,,,,' . PHP_EOL .
-'internal_node_id_'.$x.',delay_discounting,,text,"Internal Node ID '.$x.'",,,,,,,,,,,,,' . PHP_EOL .
-'choice1_'.$x.',delay_discounting,,text,"Choice 1 '.$x.'",,,,,,,,,,,,,' . PHP_EOL .
-'choice2_'.$x.',delay_discounting,,text,"Choice 2 '.$x.'",,,,,,,,,,,,,' . PHP_EOL .
-'trialnum_'.$x.',delay_discounting,,text,"Trial Number '.$x.'",,,,,,,,,,,,,' . PHP_EOL .
-'amount_'.$x.',delay_discounting,,text,"Amount '.$x.'",,,,,,,,,,,,,' . PHP_EOL .
-'delays_'.$x.',delay_discounting,,text,"Delays '.$x.'",,,,,,,,,,,,,' . PHP_EOL .
-'response_'.$x.',delay_discounting,,text,"Response '.$x.'",,,,,,,,,,,,,' . PHP_EOL .
-'t_'.$x.',delay_discounting,,text,"T '.$x.'",,,,,,,,,,,,,' . PHP_EOL .
-'stim_onset_'.$x.',delay_discounting,,text,"Stim Onset '.$x.'",,,,,,,,,,,,,' . PHP_EOL .
-'now_'.$x.',delay_discounting,,text,"T '.$x.'",,,,,,,,,,,,,' . PHP_EOL .
-'is_data_element_'.$x.',delay_discounting,,text,"Is Data Element '.$x.'",,,,,,,,,,,,,' . PHP_EOL;
+$out .= 'ded_rt_'.$x.',delay_discounting,,text,"Reaction time '.$x.'",,,,,,,,,,,,,' . PHP_EOL .
+'ded_stimulus_'.$x.',delay_discounting,,text,"Stimulus '.$x.'",,,,,,,,,,,,,' . PHP_EOL.
+'ded_stimulus_type_'.$x.',delay_discounting,,text,"Stimulus Type'.$x.'",,,,,,,,,,,,,' . PHP_EOL.
+'ded_button_pressed_'.$x.',delay_discounting,,text,"Button Pressed '.$x.'",,,,,,,,,,,,,' . PHP_EOL.
+'ded_key_press_'.$x.',delay_discounting,,text,"Button Pressed '.$x.'",,,,,,,,,,,,,' . PHP_EOL. 
+'ded_trial_type_'.$x.',delay_discounting,,text,"Trial Type '.$x.'",,,,,,,,,,,,,' . PHP_EOL. 
+'ded_trial_index_'.$x.',delay_discounting,,text,"Trial Index '.$x.'",,,,,,,,,,,,,' . PHP_EOL. 
+'ded_time_elapsed_'.$x.',delay_discounting,,text,"Time Elapsed '.$x.'",,,,,,,,,,,,,' . PHP_EOL .
+'ded_internal_node_id_'.$x.',delay_discounting,,text,"Internal Node ID '.$x.'",,,,,,,,,,,,,' . PHP_EOL .
+'ded_choice1_'.$x.',delay_discounting,,text,"Choice 1 '.$x.'",,,,,,,,,,,,,' . PHP_EOL .
+'ded_choice2_'.$x.',delay_discounting,,text,"Choice 2 '.$x.'",,,,,,,,,,,,,' . PHP_EOL .
+'ded_trialnum_'.$x.',delay_discounting,,text,"Trial Number '.$x.'",,,,,,,,,,,,,' . PHP_EOL .
+'ded_amount_'.$x.',delay_discounting,,text,"Amount '.$x.'",,,,,,,,,,,,,' . PHP_EOL .
+'ded_delays_'.$x.',delay_discounting,,text,"Delays '.$x.'",,,,,,,,,,,,,' . PHP_EOL .
+'ded_response_'.$x.',delay_discounting,,text,"Response '.$x.'",,,,,,,,,,,,,' . PHP_EOL .
+'ded_t_'.$x.',delay_discounting,,text,"T '.$x.'",,,,,,,,,,,,,' . PHP_EOL .
+'ded_stim_onset_'.$x.',delay_discounting,,text,"Stim Onset '.$x.'",,,,,,,,,,,,,' . PHP_EOL .
+'ded_now_'.$x.',delay_discounting,,text,"Now '.$x.'",,,,,,,,,,,,,' . PHP_EOL .
+'ded_is_data_element_'.$x.',delay_discounting,,text,"Is Data Element '.$x.'",,,,,,,,,,,,,' . PHP_EOL;
 
 
 }
