@@ -1,11 +1,12 @@
 <?php 
 // writes instrument to screen for saving as csv
-$out = '"Variable / Field Name","Form Name","Section Header","Field Type","Field Label","Choices, Calculations, OR Slider Labels","Field Note","Text Validation Type OR Show Slider Number","Text Validation Min","Text Validation Max",Identifier?,"Branching Logic (Show field only if...)","Required Field?","Custom Alignment","Question Number (surveys only)","Matrix Group Name","Matrix Ranking?","Field Annotation"' .
+$out = '"Variable / Field Name","Form Name","Section Header","Field Type","Field Label","Choices, Calculations, OR Slider Labels","Field Note","Text Validation Type OR Show Slider Number","Text Validation Min","Text Validation Max",Identifier?,"Branching Logic (Show field only if...)","Required Field?","Custom Alignment","Question Number (surveys only)","Matrix Group Name","Matrix Ranking?","Field Annotation"' . PHP_EOL .
 'lmt_site,little_man_task,,text,"Site",,,,,,,,,,,,,' . PHP_EOL .
+'lmt_subject_id,little_man_task,,text,"Subject ID",,,,,,,,,,,,,' . PHP_EOL .
 'lmt_assessment_date,little_man_task,,text,"Assessment Date",,,,,,,,,,,,,' . PHP_EOL .
 'lmt_event_name,little_man_task,,text,"Event name",,,,,,,,,,,,,' . PHP_EOL .
-'lmt_serverDate,little_man_task,,text,"Event name",,,,,,,,,,,,,' . PHP_EOL .
-'lmt_serverTime,little_man_task,,text,"Event name",,,,,,,,,,,,,' . PHP_EOL .
+'lmt_server_date,little_man_task,,text,"Server Date",,,,,,,,,,,,,' . PHP_EOL .
+'lmt_server_time,little_man_task,,text,"Server Time",,,,,,,,,,,,,' . PHP_EOL .
 'lmt_complete,little_man_task,,text,"Task Complete",,,,,,,,,,,,,' . PHP_EOL;
 
 for ($x = 0; $x < 45; $x++) {
