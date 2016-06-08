@@ -9,7 +9,7 @@ $out = '"Variable / Field Name","Form Name","Section Header","Field Type","Field
 'ded_server_time,delay_discounting,,text,"Sserver Time",,,,,,,,,,,,,' . PHP_EOL .
 'ded_site,delay_discounting,,text,"Site",,,,,,,,,,,,,' . PHP_EOL .
 'ded_run,delay_discounting,,text,"Run",,,,,,,,,,,,,' . PHP_EOL .
-'assessment_date,delay_discounting,,text,"Assessment Date",,,,,,,,,,,,,' . PHP_EOL .
+'ded_assessment_date,delay_discounting,,text,"Assessment Date",,,,,,,,,,,,,' . PHP_EOL .
 'ded_ip_1_day,delay_discounting,,text,"IP 1 day",,,,,,,,,,,,,' . PHP_EOL .
 'ded_ip_1_week,delay_discounting,,text,"IP 1 week",,,,,,,,,,,,,' . PHP_EOL .
 'ded_ip_1_month,delay_discounting,,text,"IP 1 month",,,,,,,,,,,,,' . PHP_EOL .
