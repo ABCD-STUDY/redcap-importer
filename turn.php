@@ -5,15 +5,16 @@
 *  Author: James Hudnall
 *  (c) 2016 - ABCD UCSD
 */
-
 error_reporting(E_ALL);
 ini_set("display_errors", 1);
+// remove two lines below. Testing only 
+require_once 'code/php/config.php'; // REMOVE - for testing only
+$token = $GLOBALS['api_token']; // REMOVE - for testing only
 
 /*
-require_once 'code/php/config.php';
 require_once 'code/php/class.reader.php';
-$Path = $_SERVER["DOCUMENT_ROOT"] .'/applications/little-man-task/code/sites/';
-*/
+
+
 # todo: change based on the current user
 
   $offline=FALSE;
@@ -69,14 +70,15 @@ $Path = $_SERVER["DOCUMENT_ROOT"] .'/applications/little-man-task/code/sites/';
   } else {
     $token = "9560341DB5CD569629990DD4BF8D5947"; // test token for offline mode
   }
+  */
 $api_token = $token; // "9560341DB5CD569629990DD4BF8D5947";
 $api_url   = "https://abcd-rc.ucsd.edu/redcap/api/";
 
-require_once 'class.reader.php';
-$project = 'lmt';
+require_once 'code/php/class.reader.php';
+
 $RootPath = '/var/www/html/applications/importerREDCap/';
 
-$Path = $RootPath.DIRECTORY_SEPARATOR.'testdata';
+$Path = $RootPath.'testdata';
 
 $latestTime = 0;
 $filestodo = array();
@@ -92,23 +94,15 @@ foreach ($iterator as $fileinfo) {
         $filestodo[] = $path_parts['dirname'] . DIRECTORY_SEPARATOR . $path_parts['filename'] . '.json';
     }
 }
-//echo("we have the following files to check");
-//print_r($filestodo);
-//echo("\n");
-// $source = $Path . $newFile;
-
+echo 'Files: ' . count($filestodo) . '<p>';
 foreach($filestodo as $source) {
     // split the subject and event from the name IF there is any file
-    if (file_exists($source)) {
-        #$c = preg_split('/[_.]/i', $newFile, -1, PREG_SPLIT_DELIM_CAPTURE);
-        
-        #$event = $c[0];
-        
-        #$subject = $c[1];
-        
+    if (file_exists($source)) { 
+        $pp = pathinfo($source);
+        $project = substr($pp['filename'], 0, 3);  // set project based on first three characters
+        echo 'Project: ' . $project . '<p>';
         $read = new Reader();
         $read->setProject($project);
-        
         $site    = $read->GetSite($source);
         
         $log = $read->Parser($source);
@@ -121,7 +115,7 @@ foreach($filestodo as $source) {
             }
             $finfo = pathinfo($source);
 	    $pathinfo = pathinfo($source);
-            rename($source, $dir . DIRECTORY_SEPARATOR . $pathinfo['filename'].".".$pathinfo['extension']);
+            //rename($source, $dir . DIRECTORY_SEPARATOR . $pathinfo['filename'].".".$pathinfo['extension']);
             // 		move file if successfully processed
         }
         else {
@@ -140,7 +134,7 @@ foreach($filestodo as $source) {
             // move file to error directory
 	    $pathinfo = pathinfo($source);
 	    // move into error directory
-            rename($source, $dir . DIRECTORY_SEPARATOR . $pathinfo['filename'].".".$pathinfo['extension']);
+           // rename($source, $dir . DIRECTORY_SEPARATOR . $pathinfo['filename'].".".$pathinfo['extension']);
             //rename($source, $dir . $newFile);
         }
         
