@@ -5,8 +5,9 @@
  
  <p>turn.php - cron job that will process files and import data
  <p>class.reader.php - Class to process JSON files and convert import them to Redcap</p>
-  <p>create-ded.php - Creates CSV file that builds instrument for DED</p>
-   <p>create-lmt.php -Creates CSV file that builds instrument for LMT</p>
+ <p>create-ded.php - Creates CSV file that builds instrument for Direct Discounting</p>
+ <p>create-lmt.php -Creates CSV file that builds instrument for Little Man Task</p>
+ <p>create-str.php -Creates CSV file that builds instrument for Stroop</p>
  
 
 SUMMARY: The data sent to json flat files by forms need to be retrieved and converted to the format of a redcap table. 
