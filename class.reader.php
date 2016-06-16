@@ -9,11 +9,25 @@
 class Reader {
 
     var $project = ''; // member variable to indicate what preset should be used to read values
-
+    /*
+     * setProject
+     * estabishes the project prefix
+     */
     function setProject($project) {
         $this->project = $project;
     }
-
+    /*
+     * is Active
+     * Determines if the file is full or empty
+     */
+    function isActive($source) {
+        $obj = (array) json_decode(file_get_contents($source), true);
+        if (count($obj) > 0) {
+             return true;
+         } else {
+             return false;
+         } 
+    }
     /*
      * GetSite
      * Returns the Site name from the file
@@ -94,7 +108,6 @@ class Reader {
     function Parser($source) {
 
         $fields = $this->GetFields(); // get data dictionary from redcap
-        $arr = (array) json_decode($source); // cast data to object for processing
         $obj = (object) json_decode(file_get_contents($source), true); // cast data to object for processing
         $log = null;
         $send = array();
@@ -112,44 +125,10 @@ class Reader {
                 $ks[$i]
             };
         }
-        array_keys($arr);
-        switch ($this->project) {
-            case 'ded':
-                $send['record_id'] = $obj->{
-                    "ded_subject_id"
+     
+        $send['record_id'] = $obj->{
+                    "subject_id"
                 };
-                $send['ded_id'] = $obj->{
-                    "ded_subject_id"
-                };
-                $send['redcap_event_name'] = $obj->{
-                    "ded_event_name"
-                };
-                break;
-            case 'lmt':
-                $send['record_id'] = $obj->{
-                    "lmt_subject_id"
-                };
-                $send['lmt_id'] = $obj->{
-                    "lmt_subject_id"
-                };
-                $send['redcap_event_name'] = $obj->{
-                    "lmt_event_name"
-                };
-                break;
-            case 'str':
-                $send['record_id'] = $obj->{
-                    "str_subject_id"
-                };
-                $send['str_id'] = $obj->{
-                    "str_subject_id"
-                };
-                $send['redcap_event_name'] = $obj->{
-                    "str_event_name"
-                };
-                break;
-        }
-
-
         $x = 0;
         // pull data array from object
         $data = $obj->data;
@@ -174,6 +153,7 @@ class Reader {
             $x++;
         }
         // output assembled array to API for processing.
+        unset($send['subject_id']);
         $log = $this->Import($send);
         return $log;
     }
