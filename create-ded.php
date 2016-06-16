@@ -19,8 +19,8 @@ $out = '"Variable / Field Name","Form Name","Section Header","Field Type","Field
 'ded_k,delay_discounting,,text,"K",,,,,,,,,,,,,' . PHP_EOL .
 'ded_logk,delay_discounting,,text,"Log K",,,,,,,,,,,,,' . PHP_EOL .
 'ded_consistency,delay_discounting,,text,"Consistency",,,,,,,,,,,,,' . PHP_EOL .
-'ded_consistent_resp_check01,delay_discounting,,text,"Consistent resp check 1",,,,,,,,,,,,,' . PHP_EOL .
-'ded_consistent_resp_check02,delay_discounting,,text,"Consistent resp check 2",,,,,,,,,,,,,' . PHP_EOL .
+'ded_cons_resp_check01,delay_discounting,,text,"Consistent resp check 1",,,,,,,,,,,,,' . PHP_EOL .
+'ded_cons_resp_check02,delay_discounting,,text,"Consistent resp check 2",,,,,,,,,,,,,' . PHP_EOL .
 'ded_event_name,delay_discounting,,text,"Event name",,,,,,,,,,,,,' . PHP_EOL;
 
 
