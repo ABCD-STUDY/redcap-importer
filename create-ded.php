@@ -4,6 +4,7 @@ ini_set("display_errors", 1);
 // writes instrument to screen for saving as csv
 $out = '"Variable / Field Name","Form Name","Section Header","Field Type","Field Label","Choices, Calculations, OR Slider Labels","Field Note","Text Validation Type OR Show Slider Number","Text Validation Min","Text Validation Max",Identifier?,"Branching Logic (Show field only if...)","Required Field?","Custom Alignment","Question Number (surveys only)","Matrix Group Name","Matrix Ranking?","Field Annotation"'. PHP_EOL .
 'record_id,delay_discounting,,text,"Record ID",,,,,,,,,,,,,' . PHP_EOL .
+'ded_id,delay_discounting,,text,"Record ID",,,,,,,,,,,,,' . PHP_EOL .
 'ded_subject_id,delay_discounting,,text,"Subject ID",,,,,,,,,,,,,' . PHP_EOL .
 'ded_server_date,delay_discounting,,text,"Server Date",,,,,,,,,,,,,' . PHP_EOL .
 'ded_server_time,delay_discounting,,text,"Sserver Time",,,,,,,,,,,,,' . PHP_EOL .
@@ -51,7 +52,7 @@ $out .= 'ded_rt_'.$x.',delay_discounting,,text,"Reaction time '.$x.'",,,,,,,,,,,
 }
 echo $out. PHP_EOL;
 
-        $file = fopen('ded_file.csv', "w");
+        $file = fopen('instrument.csv', "w");
         fwrite($file, $out);
         fclose($file);
 
