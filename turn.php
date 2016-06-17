@@ -1,10 +1,10 @@
-<?php
+<?php 
 /*
-*  Turn Cron
-*  Looks for recent files and processes them
-*  Author: James Hudnall
-*  (c) 2016 - ABCD UCSD
-*/
+ *  Turn Cron
+ *  Looks for recent files and processes them
+ *  Author: James Hudnall
+ *  (c) 2016 - ABCD UCSD
+ */
 error_reporting(E_ALL);
 ini_set("display_errors", 1);
 // remove two lines below. Testing only 
@@ -72,7 +72,7 @@ require_once 'code/php/class.reader.php';
   }
   */
 $api_token = $token; // "9560341DB5CD569629990DD4BF8D5947";
-$api_url   = "https://abcd-rc.ucsd.edu/redcap/api/";
+$api_url = "https://abcd-rc.ucsd.edu/redcap/api/";
 
 require_once 'code/php/class.reader.php';
 
@@ -83,62 +83,60 @@ $Path = $RootPath.'testdata';
 $latestTime = 0;
 $filestodo = array();
 $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($Path), RecursiveIteratorIterator::CHILD_FIRST);
-foreach ($iterator as $fileinfo) {
-    if (in_array($fileinfo->getFilename(), array(".", "..")))
-        continue;
-    if (is_dir($fileinfo))
-        continue;
+foreach($iterator as $fileinfo) {
+    if (in_array($fileinfo->getFilename(), array(".", ".."))) continue;
+    if (is_dir($fileinfo)) continue;
     $path_parts = pathinfo($fileinfo);
-    
+
     if ($fileinfo->isFile() && $path_parts['extension'] == "json") {
-        $filestodo[] = $path_parts['dirname'] . DIRECTORY_SEPARATOR . $path_parts['filename'] . '.json';
+        $filestodo[] = $path_parts['dirname'].DIRECTORY_SEPARATOR.$path_parts['filename'].'.json';
     }
 }
-echo 'Files: ' . count($filestodo) . '<p>';
+// loop through array of files found
 foreach($filestodo as $source) {
-    // split the subject and event from the name IF there is any file
-    if (file_exists($source)) { 
+    // split the subject and event from the name IF there is any file - TO BE REMOVED
+    if (file_exists($source)) {
         $pp = pathinfo($source);
-        $project = substr($pp['filename'], 0, 3);  // set project based on first three characters
-        echo 'Project: ' . $project . '<p>';
+        $project = substr($pp['filename'], 0, 3); // set project based on first three characters
         $read = new Reader();
-        $read->setProject($project);
-        $site    = $read->GetSite($source);
-        
-        $log = $read->Parser($source);
-        if (!isset($log)) {
-            
-            $dir = $RootPath . 'archive_'.$project."_".$site . '/';
-            
-            if( !is_dir($dir)) {
-                mkdir($dir, 0777, true);
-            }
-            $finfo = pathinfo($source);
-	    $pathinfo = pathinfo($source);
-            //rename($source, $dir . DIRECTORY_SEPARATOR . $pathinfo['filename'].".".$pathinfo['extension']);
-            // 		move file if successfully processed
-        }
-        else {
-            $dir = $RootPath . 'error_'.$project.'_'. $site . '/';
+        if ($read->isActive($source)) { // if the file has data, process it
+            $read->setProject($project);
+            $site = $read->GetSite($source);
 
-            if( !is_dir($dir)) {
-                echo("create directory: ". $dir. "\n");
-                mkdir($dir, 0777, true);
+            $log = $read->Parser($source);
+            if (!isset($log)) {
+
+                $dir = $RootPath.'archive_'.$project."_".$site.'/';
+
+                if (!is_dir($dir)) {
+                    mkdir($dir, 0777, true);
+                }
+                $finfo = pathinfo($source);
+                $pathinfo = pathinfo($source);
+                rename($source, $dir . DIRECTORY_SEPARATOR . $pathinfo['filename'].".".$pathinfo['extension']);
+                // 		move file if successfully processed
+            } else {
+                $dir = $RootPath.'error_'.$project.'_'.$site.'/';
+
+                if (!is_dir($dir)) {
+                    echo("create directory: ".$dir."\n");
+                    mkdir($dir, 0777, true);
+                }
+                $finfo = pathinfo($source);
+
+                // create log
+                $out = fopen($dir.DIRECTORY_SEPARATOR.$finfo['filename']."_error.txt", "w");
+                fwrite($dir.$out, $log);
+                fclose($out);
+                // move file to error directory
+                $pathinfo = pathinfo($source);
+                // move into error directory
+                rename($source, $dir . DIRECTORY_SEPARATOR . $pathinfo['filename'].".".$pathinfo['extension']);
+                rename($source, $dir . $newFile);
             }
-            $finfo = pathinfo($source);
-            
-            // create log
-            $out = fopen($dir.DIRECTORY_SEPARATOR.$finfo['filename']."_error.txt", "w");
-            fwrite($dir . $out, $log);
-            fclose($out);
-            // move file to error directory
-	    $pathinfo = pathinfo($source);
-	    // move into error directory
-           // rename($source, $dir . DIRECTORY_SEPARATOR . $pathinfo['filename'].".".$pathinfo['extension']);
-            //rename($source, $dir . $newFile);
         }
-        
+
     } else {
-        echo 'File Not Found: ' . $source;
+        echo 'File Not Found: '.$source;
     }
 }
