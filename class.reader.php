@@ -121,9 +121,9 @@ class Reader {
             if ($ks[$i] == $this->project."_subject_id") continue;
             if ($ks[$i] == "event_name") continue;
             // copy all that are unique
-            $send[$ks[$i]] = $obj->{
+            $send[$ks[$i]] = trim($obj->{
                 $ks[$i]
-            };
+            });
         }
      
         $send['record_id'] = $obj->{
