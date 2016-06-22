@@ -127,7 +127,7 @@ class Reader {
         }
      
         $send['record_id'] = $obj->{
-                    "subject_id"
+                     $this->project."_subject_id"
                 };
         $x = 0;
         // pull data array from object
