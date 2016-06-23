@@ -8,80 +8,40 @@
 error_reporting(E_ALL);
 ini_set("display_errors", 1);
 
-//parse_str($_SERVER['argv'][1], $_GET); // capture cron variables passed
-//var_dump($_GET);
-// remove two lines below. Testing only
-require_once 'code/php/config.php'; // REMOVE - for testing only
-$token = $GLOBALS['api_token']; // REMOVE - for testing only
+//
+// parameter for this script as used by cron
+//   turn.php <site> <project>
+//   */10 * * * *      php turn.php /var/www/html/applications/little-man-task/ data/UCSD lmt
+//
 
-/*
-require_once 'code/php/class.reader.php';
+require_once 'class.reader.php';
 
-
-# todo: change based on the current user
-
-$offline=FALSE;
-if( !isset($_SERVER) || !isset($_SERVER["DOCUMENT_ROOT"]) || $_SERVER["DOCUMENT_ROOT"] == "") {
-$_SERVER["DOCUMENT_ROOT"] = "/var/www/html/";
-$offline = TRUE;
-echo("START in offline mode");
+if ($argc !== 4) {
+   echo ("Usage: provide path <sub-path to data> <project shortcut>\n\n");
+   return;
 }
 
-if ($offline == FALSE) {
-
-session_start();
-
-include($_SERVER["DOCUMENT_ROOT"]."/code/php/AC.php");
-$user_name = check_logged(); /// function checks if we are logged in
-$admin = false;
-
-if ($user_name == "") {
-// user is not logged in
-return;
-} else {
-$admin = true;
-}
-
-$permissions = list_permissions_for_user( $user_name );
-
-// find the first permission that corresponds to a site
-// Assumption here is that a user can only add assessment for the first site he has permissions for!
-$site = "";
-foreach ($permissions as $per) {
-$a = explode("Site", $per); // permissions should be structured as "Site<site name>"
-
-if (count($a) > 0) {
-$site = $a[1];
-break;
-}
-}
-# todo, do this for all site permissions, not just the first one
-if ($site == "") {
-echo (json_encode ( array( "message" => "Error: no site assigned to this user" ) ) );
-return;
-}
-
-# use the site to lookup the correct token
-$tokens = json_decode(file_get_contents('tokens.json'),true);
-$keys = array_keys($tokens);
-$token = "";
-foreach($keys as $k) {
-if (strtolower($k) == strtolower($site)) {
-$token = $tokens[$k];
-}
-}
-} else {
-$token = "9560341DB5CD569629990DD4BF8D5947"; // test token for offline mode
-}
-*/
-$api_token = $token; // "9560341DB5CD569629990DD4BF8D5947";
+$path      = $_SERVER['argv'][1];
+$site_path = $_SERVER['argv'][2];
+$project   = $_SERVER['argv'][3];
 $api_url   = "https://abcd-rc.ucsd.edu/redcap/api/";
 
-require_once 'code/php/class.reader.php';
+$logfile = $path.DIRECTORY_SEPARATOR.$project.".log";
+file_put_contents($logfile, "called with : ".$path." ".$site_path." ".$project."\n", FILE_APPEND);
 
-$RootPath = '/var/www/html/applications/importerREDCap/';
-
-$Path = $RootPath.'testdata';
+$RootPath = $path;
+// path to assessment files
+$Path = $RootPath.DIRECTORY_SEPARATOR.$site_path;
+// path to directory for failed imports
+$FailedPath = $RootPath.DIRECTORY_SEPARATOR.'data_import_failed';
+if (!is_dir($FailedPath)) {
+   mkdir($FailedPath, 0700, TRUE);
+}
+// path to drectory for imported scans
+$ArchivePath = $RootPath.DIRECTORY_SEPARATOR.'data_import_archive';
+if (!is_dir($ArchivePath)) {
+   mkdir($ArchivePath, 0700, TRUE);
+}
 
 $latestTime = 0;
 $filestodo = array();
@@ -97,58 +57,80 @@ foreach ($iterator as $fileinfo) {
         $filestodo[] = $path_parts['dirname'] . DIRECTORY_SEPARATOR . $path_parts['filename'] . '.json';
     }
 }
-$read = new Reader();
-//echo 'Files: ' . count($filestodo) . '<p>';
+file_put_contents($logfile, "found ".count($filestodo)." files to process\n", FILE_APPEND);
+
+// now start reading the files
 foreach($filestodo as $source) {
     // split the subject and event from the name IF there is any file
     
     if (file_exists($source)) {
+        file_put_contents($logfile, "  reading ".$source."\n", FILE_APPEND);
+
+        $read = new Reader();
+	
         $pp = pathinfo($source);
-        $project = substr($pp['filename'], 0, 3);  // set project based on first three characters
+	// project is supplied as an argument to this function (cron job argument)
+        // $project = substr($pp['filename'], 0, 3);  // set project based on first three characters
         //echo 'Project: ' . $project . '<p>';
-        $obj = (array) json_decode(file_get_contents($source), true);
+        // $obj = (array) json_decode(file_get_contents($source), true);
        
         if ($read->isActive($source)) {
-            
+            file_put_contents($logfile, "  file is active: ".$source."\n", FILE_APPEND);
+
             $read->setProject($project);
             $site    = $read->GetSite($source);
-            
+
+	    // use the site information to read the token for this upload
+	    $tokens = json_decode(file_get_contents('/var/www/html/code/php/tokens.json'),TRUE);
+	    if (!isset($tokens[$site])) {
+               file_put_contents($logfile, "  ERRRO detecting token for site : ".$site." from file ".$source."\n", FILE_APPEND);	    
+	       continue;
+	    }
+	    $api_token = $tokens[$site];
+	    $read->setToken($api_token);
+            file_put_contents($logfile, "  use this token to read ".$api_token."\n", FILE_APPEND);
+
             $log = $read->Parser($source);
             if (!isset($log)) {
-                
-                $dir = $RootPath . 'archive_'.$project."_".$site . '/';
-                
-                if( !is_dir($dir)) {
+                file_put_contents($logfile, "  import no problems ".$source."\n", FILE_APPEND);
+
+
+                // create a location to store error messages and files that could not be loaded
+                $dir = $ArchivePath.DIRECTORY_SEPARATOR.$site;                
+                if ( !is_dir($dir)) {
                     mkdir($dir, 0777, true);
                 }
+		
                 $finfo = pathinfo($source);
                 $pathinfo = pathinfo($source);
-                // rename($source, $dir . DIRECTORY_SEPARATOR . $pathinfo['filename'].".".$pathinfo['extension']);
+
+		file_put_contents($logfile, "  move file to ".$dir . DIRECTORY_SEPARATOR . $pathinfo['filename'].".".$pathinfo['extension']."\n", FILE_APPEND);
+
+                rename($source, $dir . DIRECTORY_SEPARATOR . $pathinfo['filename'].".".$pathinfo['extension']);
                 // 		move file if successfully processed
-            }
-            else {
-                $dir = $RootPath . 'error_'.$project.'_'. $site . '/';
+            } else {
+                $dir = $FailedPath . DIRECTORY_SEPARATOR . $site;
+
+                file_put_contents($logfile, "  import ERROR ".$source." with ->\"". $log."\"\n", FILE_APPEND);
                 
                 if( !is_dir($dir)) {
-                    echo("create directory: ". $dir. "\n");
                     mkdir($dir, 0777, true);
                 }
                 $finfo = pathinfo($source);
                 
                 // create log
-                $out = fopen($dir.DIRECTORY_SEPARATOR.$finfo['filename']."_error.txt", "w");
-               // fwrite($dir . $out, $log);
-                fclose($out);
+		file_put_contents($dir.DIRECTORY_SEPARATOR.$finfo['filename']."_error.txt", $log);
+
                 // move file to error directory
                 $pathinfo = pathinfo($source);
+
+		file_put_contents($logfile, "  move file to ".$dir . DIRECTORY_SEPARATOR . $pathinfo['filename'].".".$pathinfo['extension'], FILE_APPEND);
+		
                 // move into error directory
-                // rename($source, $dir . DIRECTORY_SEPARATOR . $pathinfo['filename'].".".$pathinfo['extension']);
-                //rename($source, $dir . $newFile);
+                rename($source, $dir . DIRECTORY_SEPARATOR . $pathinfo['filename'].".".$pathinfo['extension']);
             }
-        } else {
-            print_r($obj);
         }
     } else {
-        echo 'File Not Found: ' . $source;
+	file_put_contents($logfile, "ERROR: file not found ".$source, FILE_APPEND);
     }
 }
