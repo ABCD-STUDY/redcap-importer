@@ -7,11 +7,17 @@
  *
  */
 class Reader {
-
     var $project = ''; // member variable to indicate what preset should be used to read values
     var $obj = null;
     var $token = null;
     var $fname = null;
+    /*
+    *  Constructor
+    */
+    function __construct($source) {
+        $this->obj = json_decode(file_get_contents($source), false);
+        $this->fname = substr($source, strrpos($source, '/') + 1);
+    }
     /*
      * setProject
      * estabishes the project prefix
@@ -22,20 +28,19 @@ class Reader {
     function setToken($token) {
         $this->token = $token;
     }
+    /*
     function readDataFile($source) {
-        if ($this->obj == null) {
+        if ($this->obj === null) {
            $this->obj = json_decode(file_get_contents($source), true);
 	   $this->fname = $source;
 	}
-    }
     /*
      * is Active
      * Determines if the file is full or empty
      */
-    function isActive($source) {
-        $this->readDataFile($source);        
-
-        if (count($this->obj['data']) > 0) {
+    function isActive() {
+        $od = get_object_vars ($this->obj);
+        if (count($od['data']) > 0) {
              return true;
          } else {
              return false;
@@ -45,19 +50,16 @@ class Reader {
      * GetSite
      * Returns the Site name from the file
      */
-
     function GetSite($source = array()) {
         $site = NULL;
-	$this->readDataFile($source);
-
+        $od = get_object_vars($this->obj);
 	// look in the top level of $this->obj for a field that ends in _site
-        if (isset($this->obj[$this->project.'_site'])) {
-           $site = $this->obj[$this->project.'_site'];
+        if (isset($od[$this->project.'_site'])) {
+           $site = $od[$this->project.'_site'];
         } else {
 	   echo ("Error: could not find site as ".$this->project.'_site in '.$source."\n");
            return;
         }
-
         return $site;
     }
     /**
@@ -66,11 +68,8 @@ class Reader {
      *
      */
     function GetFields() {
-
         $data = array('token' => $this->token, 'content' => 'exportFieldNames', 'format' => 'json', 'returnFormat' => 'json');
-
         $ch = curl_init();
-
         curl_setopt($ch, CURLOPT_URL, 'https://abcd-rc.ucsd.edu/redcap/api/');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -81,12 +80,10 @@ class Reader {
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($ch, CURLOPT_FRESH_CONNECT, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data, '', '&'));
-
         $output = curl_exec($ch);
         //print $output;
         curl_close($ch);
         $p = explode(",", $output);
-
         $px = count($p);
         $pz = ($px / 3); // remove excess info by splitting data
         $x = 0;
@@ -109,18 +106,16 @@ class Reader {
      *
      * @param string $source - file path to source file
      */
-
     function Parser($source) {
-
         $fields = $this->GetFields(); // get data dictionary from redcap
-	$this->readDataFile($source);
+	 //   $this->readDataFile($source);
         $log = null;
         $send = array();
-
         //
         // copy all global level keys from data
         //
-        $ks = array_keys(get_object_vars($this->obj));
+             $ks = array_keys(get_object_vars($this->obj));
+
         for ($i = 0; $i < count($ks); $i++) {
             if ($ks[$i] == "data")
 	       continue;
@@ -147,7 +142,6 @@ class Reader {
                     if (is_array($item)) $item = $item[0];
                     if (is_string($item)) $item = ($key === $this->project.'_stimulus') ? htmlspecialchars($item) : $item; // make sure html characters are encoded for stimulus
                 }
-
                 if (is_bool($item)) {
                     $item = ($item) ? "TRUE" : "FALSE";
                 }
@@ -158,6 +152,7 @@ class Reader {
             $x++;
         }
         // output assembled array to API for processing.
+        if (!$send['record_id'])  $send['record_id'] = $send[$this->project.'_subject_id'];
         $log = $this->Import($send);
         return $log;
     }
@@ -167,13 +162,10 @@ class Reader {
      *
      */
     function Import($line) {
-
         $log = null;
         $rec = json_encode($line);
         $record = '['.$rec.']';
-
         $ch = curl_init();
-
         $data = array('token' => $this->token, 'content' => 'record', 'format' => 'json', 'type' => 'flat', 'overwriteBehavior' => 'normal', 'data' => $record, 'returnContent' => 'count', 'returnFormat' => 'json');
         curl_setopt($ch, CURLOPT_URL, $GLOBALS['api_url']);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -185,13 +177,9 @@ class Reader {
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($ch, CURLOPT_FRESH_CONNECT, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data, '', '&'));
-
         if ($output = curl_exec($ch)) {
-
             $pos = strrpos($output, "error");
-
             if ($pos === false) {
-
                 // 				show successful responses in green. Strip tags
                 $rec = str_replace(",", ",<br>", $record);
                 // 				make readable
@@ -200,7 +188,6 @@ class Reader {
                 $op = str_replace("\"", "", $op);
                 print "INFO send ok for ".$this->fname."\n".'  <br/><span  style="color:green">Success: '.$op.'</span><br/>'."\n";
             } else {
-
                 // 				show failed responses in red. Strip tags
                 $rec = str_replace(",", ",<br>", $record);
                 // echo $record;
@@ -212,23 +199,16 @@ class Reader {
                 $log = $record.$op;
             }
         }
-
         curl_close($ch);
-
         return $log;
-
     }
-
     /**
      *  Export
      *  Method to determine status of data before sending to avoid duplication
      *
      **/
-
     function Export($recordID) {
-
         $data = array('token' => $this->token, 'content' => 'record', 'format' => 'json', 'type' => 'flat', 'rawOrLabel' => 'raw', 'rawOrLabelHeaders' => 'raw', 'exportCheckboxLabel' => 'false', 'exportSurveyFields' => 'false', 'exportDataAccessGroups' => 'false', 'returnFormat' => 'json');
-
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $GLOBALS['api_url']);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -245,5 +225,4 @@ class Reader {
         curl_close($ch);
     }
 }
-
 ?>
