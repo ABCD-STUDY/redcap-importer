@@ -3,13 +3,12 @@ error_reporting(E_ALL);
 ini_set("display_errors", 1);
 // writes instrument to screen for saving as csv
 $out = '"Variable / Field Name","Form Name","Section Header","Field Type","Field Label","Choices, Calculations, OR Slider Labels","Field Note","Text Validation Type OR Show Slider Number","Text Validation Min","Text Validation Max",Identifier?,"Branching Logic (Show field only if...)","Required Field?","Custom Alignment","Question Number (surveys only)","Matrix Group Name","Matrix Ranking?","Field Annotation"'. PHP_EOL .
-'record_id,delay_discounting,,text,"Record ID",,,,,,,,,,,,,' . PHP_EOL .
-'ded_id,delay_discounting,,text,"Record ID",,,,,,,,,,,,,' . PHP_EOL .
 'ded_subject_id,delay_discounting,,text,"Subject ID",,,,,,,,,,,,,' . PHP_EOL .
 'ded_server_date,delay_discounting,,text,"Server Date",,,,,,,,,,,,,' . PHP_EOL .
 'ded_server_time,delay_discounting,,text,"Sserver Time",,,,,,,,,,,,,' . PHP_EOL .
 'ded_site,delay_discounting,,text,"Site",,,,,,,,,,,,,' . PHP_EOL .
 'ded_run,delay_discounting,,text,"Run",,,,,,,,,,,,,' . PHP_EOL .
+'ded_user,delay_discounting,,text,"User",,,,,,,,,,,,,' . PHP_EOL .
 'ded_assessment_date,delay_discounting,,text,"Assessment Date",,,,,,,,,,,,,' . PHP_EOL .
 'ded_ip_1_day,delay_discounting,,text,"IP 1 day",,,,,,,,,,,,,' . PHP_EOL .
 'ded_ip_1_week,delay_discounting,,text,"IP 1 week",,,,,,,,,,,,,' . PHP_EOL .

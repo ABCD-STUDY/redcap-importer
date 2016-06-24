@@ -9,9 +9,9 @@ $out = '"Variable / Field Name","Form Name","Section Header","Field Type","Field
 'str_server_time,delay_discounting,,text,"Sserver Time",,,,,,,,,,,,,' . PHP_EOL .
 'str_site,delay_discounting,,text,"Site",,,,,,,,,,,,,' . PHP_EOL .
 'str_run,delay_discounting,,text,"Run",,,,,,,,,,,,,' . PHP_EOL .
+'str_user,delay_discounting,,text,"User",,,,,,,,,,,,,' . PHP_EOL .
 'str_assessment_date,delay_discounting,,text,"Assessment Date",,,,,,,,,,,,,' . PHP_EOL .
 'str_event_name,delay_discounting,,text,"Event name",,,,,,,,,,,,,' . PHP_EOL;
-
 
 for ($x = 0; $x < 141; $x++) {
     $x = sprintf('%02d', $x);
