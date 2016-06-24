@@ -18,14 +18,13 @@ if ($argc !== 4) {
    echo ("Usage: provide path <sub-path to data> <project shortcut>\n\n");
    return;
 }
-$path      = $_SERVER['argv'][1];
+$RootPath  = $_SERVER['argv'][1];
 $site_path = $_SERVER['argv'][2];
 $project   = $_SERVER['argv'][3];
-
-$api_url   = "https://abcd-rc.ucsd.edu/redcap/api/";
+$url   = "https://abcd-rc.ucsd.edu/redcap/api/";
 $logfile = $path.DIRECTORY_SEPARATOR.$project.".log";
-file_put_contents($logfile, "called with : ".$path." ".$site_path." ".$project."\n", FILE_APPEND);
-$RootPath = $path;
+file_put_contents($logfile, "called with : ".$RootPath." ".$site_path." ".$project."\n", FILE_APPEND);
+
 // path to assessment files
 $Path = $RootPath.DIRECTORY_SEPARATOR.$site_path;
 // path to directory for failed imports
@@ -59,13 +58,12 @@ foreach($filestodo as $source) {
     
     if (file_exists($source)) {
         file_put_contents($logfile, "  reading ".$source."\n", FILE_APPEND);
-        $read = new Reader($source);	
+        $read = new Reader($source,$url,$project);	
         $pp = pathinfo($source);
       
         if ($read->isActive($source)) {
             file_put_contents($logfile, "  file is active: ".$source."\n", FILE_APPEND);
-            $read->setProject($project);
-            $site    = $read->GetSite($source);
+            $site    = $read->GetSite;
 	    // use the site information to read the token for this upload
 	    $tokens = json_decode(file_get_contents('/var/www/html/code/php/tokens.json'),TRUE);
 	    if (!isset($tokens[$site])) {
@@ -77,7 +75,7 @@ foreach($filestodo as $source) {
             file_put_contents($logfile, "  use this token to read ".$api_token."\n", FILE_APPEND);
             $log = $read->Parser($source);
             if (!isset($log)) {
-                file_put_contents($logfile, "  import no problems ".$source."\n", FILE_APPEND);
+                file_put_contents($logfile, "  Successful import ".$source."\n", FILE_APPEND);
                 // create a location to store error messages and files that could not be loaded
                 $dir = $ArchivePath.DIRECTORY_SEPARATOR.$site;                
                 if ( !is_dir($dir)) {
