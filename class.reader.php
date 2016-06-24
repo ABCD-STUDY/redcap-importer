@@ -11,12 +11,14 @@ class Reader {
     var $obj = null;
     var $token = null;
     var $fname = null;
+    var $url = null;
     /*
     *  Constructor
     */
     function __construct($source) {
         $this->obj = json_decode(file_get_contents($source), false);
-        $this->fname = substr($source, strrpos($source, '/') + 1);
+        $this->fname = $source;
+        $this->url = $GLOBALS['api_url'];
     }
     /*
      * setProject
@@ -28,12 +30,6 @@ class Reader {
     function setToken($token) {
         $this->token = $token;
     }
-    /*
-    function readDataFile($source) {
-        if ($this->obj === null) {
-           $this->obj = json_decode(file_get_contents($source), true);
-	   $this->fname = $source;
-	}
     /*
      * is Active
      * Determines if the file is full or empty
@@ -125,10 +121,6 @@ class Reader {
             });
         }
      
-        //$send['record_id'] = $this->obj->{
-        //             $this->project."_subject_id"
-        //        };
-	
         $x = 0;
         // pull data array from object
         $data = $this->obj->data;
@@ -207,22 +199,38 @@ class Reader {
      *  Method to determine status of data before sending to avoid duplication
      *
      **/
-    function Export($recordID) {
-        $data = array('token' => $this->token, 'content' => 'record', 'format' => 'json', 'type' => 'flat', 'rawOrLabel' => 'raw', 'rawOrLabelHeaders' => 'raw', 'exportCheckboxLabel' => 'false', 'exportSurveyFields' => 'false', 'exportDataAccessGroups' => 'false', 'returnFormat' => 'json');
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $GLOBALS['api_url']);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_VERBOSE, 0);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_AUTOREFERER, true);
-        curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
-        curl_setopt($ch, CURLOPT_FRESH_CONNECT, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data, '', '&'));
-        $output = curl_exec($ch);
-        print $output;
-        curl_close($ch);
+    function Export($recordID, $event) {
+<?php
+$data = array(
+    'token' => $this->token,
+    'content' => 'record',
+    'format' => 'json',
+    'type' => 'flat',
+    'records' => array($recordID),
+    'events' => array($event),
+    'rawOrLabel' => 'raw',
+    'rawOrLabelHeaders' => 'raw',
+    'exportCheckboxLabel' => 'false',
+    'exportSurveyFields' => 'false',
+    'exportDataAccessGroups' => 'false',
+    'returnFormat' => 'json'
+);
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL, $this->url);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+curl_setopt($ch, CURLOPT_VERBOSE, 0);
+curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+curl_setopt($ch, CURLOPT_AUTOREFERER, true);
+curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
+curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+curl_setopt($ch, CURLOPT_FRESH_CONNECT, 1);
+curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data, '', '&'));
+$output = curl_exec($ch);
+print $output;
+curl_close($ch);
+
+
     }
 }
 ?>
