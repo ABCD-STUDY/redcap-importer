@@ -143,8 +143,10 @@ class Reader {
             $x++;
         }
         // output assembled array to API for processing.
+        echo $send;
         if (empty($send['record_id'])) $send['record_id'] = $send[$this->project.'_subject_id'];
         $log2 = $this->Import($send);
+
         $log = $log1.$log2;
         return $log;
     }
@@ -187,7 +189,7 @@ class Reader {
                 $op = str_replace("}]", "", $op);
                 $op = str_replace("\"", "", $op);
                 $log = "Error reading file ".$this->fname."\n REDCAP:".$output."\n";
-                print $log;
+                print '<br><font color="red">'.$log.'</font>';
                 $log .= $record.$op;
             }
         }
@@ -246,7 +248,7 @@ class Reader {
         $log = null;
         $jump = null;
         $iloc = "Inst";
-        $file = array();
+        $send = array();
         // write to array
         if (($handle = fopen($source, "r")) !== FALSE) {
             $type = $this->fileType($source);
@@ -256,21 +258,88 @@ class Reader {
                 case 1:
                     // Assessment Data
                     while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-                        $file[$a] = array('pin' => $data[0], 'device_id' => $data[1], 'assessment_name' => $data[2], 'instr_order' => $data[3], 'inst_sctn' => $data[4], 'itm_ordr' => $data[5], 'inst' => $data[6], 'locale' => $data[7], 'item_id' => $data[8], 'response' => $data[9], 'score' => $data[10], 'theta' => $data[11], 'tscore' => $data[12], 'se' => $data[13], 'data_type' => $data[14], 'position' => $data[15], 'response_time' => $data[16], 'date_created' => $data[17], 'inst_start' => $data[18], 'inst_ended' => $data[19]);
+                        if ($a == 0) {
+                            $ak = $this->getOrder($data, 1);
+                        } else {
+                            $send['pin'] = $data[0];
+                            $send['device_id'] = $data[1];
+                            $send['assessment_name'] = $data[2];
+                            $send['instr_order'] = $data[3];
+                            $send['inst_sctn'] = $data[4];
+                            $send['itm_ordr'] = $data[5];
+                            $send['inst'] = $data[6];
+                            $send['locale'] = $data[7];
+                            $send['item_id'] = $data[8];
+                            $send['response'] = $data[9];
+                            $send['score'] = $data[10];
+                            $send['theta'] = $data[11];
+                            $send['tscore'] = $data[12];
+                            $send['se'] = $data[13];
+                            $send['data_type'] = $data[14];
+                            $send['position'] = $data[15];
+                            $send['response_time'] = $data[16];
+                            $send['date_created'] = $data[17];
+                            $send['inst_start'] = $data[18];
+                            $send['inst_ended'] = $data[19];
+                        }
                         $a++;
                     }
                     break;
                 case 2:
                     //  Assessment Scores
                     while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-                        $file[$a] = array('scr_pin' => $data[0], 'scr_device' => $data[1], 'scr_name' => $data[2], 'scr_inst' => $data[3], 'scr_raw' => $data[4], 'scr_theta' => $data[5], 'scr_tscore' => $data[6], 'scr_se' => $data[7], 'scr_item_count' => $data[8], 'scr_finished' => $data[9], 'scr_col_1' => $data[10], 'scr_col_2' => $data[11], 'scr_col_3' => $data[12], 'scr_col_4' => $data[13], 'scr_col_5' => $data[14], 'scr_language' => $data[15], 'scr_comp_score' => $data[16], 'scr_standard_score' => $data[17], 'scr_age_score' => $data[18], 'scr_corrected_tscore' => $data[19], 'scr_breakoff' => $data[20], 'scr_status_2' => $data[21], 'scr_reason' => $data[22], 'scr_reason_other' => $data[23]);
+                        if ($a == 0) {
+                            $ak = $this->getOrder($data, 2);
+                        } else {
+                            $send['scr_pin'] = $data[0];
+                            $send['scr_device'] = $data[1];
+                            $send['scr_name'] = $data[2];
+                            $send['scr_inst'] = $data[3];
+                            $send['scr_raw'] = $data[4];
+                            $send['scr_theta'] = $data[5];
+                            $send['scr_tscore'] = $data[6];
+                            $send['scr_se'] = $data[7];
+                            $send['scr_item_count'] = $data[8];
+                            $send['scr_finished'] = $data[9];
+                            $send['scr_col_1'] = $data[10];
+                            $send['scr_col_2'] = $data[11];
+                            $send['scr_col_3'] = $data[12];
+                            $send['scr_col_4'] = $data[13];
+                            $send['scr_col_5'] = $data[14];
+                            $send['scr_language'] = $data[15];
+                            $send['scr_comp_score'] = $data[16];
+                            $send['scr_standard_score'] = $data[17];
+                            $send['scr_age_score'] = $data[18];
+                            $send['scr_corrected_tscore'] = $data[19];
+                            $send['scr_breakoff'] = $data[20];
+                            $send['scr_status_2'] = $data[21];
+                            $send['scr_reason'] = $data[22];
+                            $send['scr_reason_other'] = $data[23];
+                        }
                         $a++;
                     }
                     break;
                 case 3:
                     // Registration Data
                     while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-                        $file[$a] = array('reg_pin' => $data[0], '_reg_device' => $data[1], 'reg_name' => $data[2], 'reg_age' => $data[3], 'reg_educate' => $data[4], 'reg_mother' => $data[5], 'reg_father' => $data[6], 'reg_guardian' => $data[7], 'reg_starting' => $data[8], 'reg_gender' => $data[9], 'reg_hand' => $data[10], 'reg_race' => $data[11], 'reg_etnicity' => $data[12]);
+                        if ($a == 0) {
+                            $ak = $this->getOrder($data, 3);
+                        } else {
+                            var_dump($data);
+                            $send['reg_pin'] = $data[0];
+                            $send['reg_device'] = $data[1];
+                            $send['reg_name'] = $data[2];
+                            $send['reg_age'] = $data[3];
+                            $send['reg_educate'] = $data[4];
+                            $send['reg_mother'] = $data[5];
+                            $send['reg_father'] = $data[6];
+                            $send['reg_guardian'] = $data[7];
+                            $send['reg_starting'] = $data[8];
+                            $send['reg_gender'] = $data[9];
+                            $send['reg_hand'] = $data[10];
+                            $send['reg_race'] = $data[11];
+                            $send['reg_etnicity'] = $data[12];
+                        }
                         $a++;
                     }
                     break;
@@ -278,14 +347,41 @@ class Reader {
             fclose($handle);
         }
         if ($type > 0) {
-            unset($file[0]);
-            $file[0] = array('redcap_event_name' => 'baseline_arm_1');
-            $rec = json_encode($file);
+            $send['redcap_event_name'] = 'baseline_arm_1';
+            $rec = json_encode($send);
             $send = '['.$rec.']';
+            echo $send;
             $log = $this->Import($send);
         }
         return $log;
 
     }
+    /*
+     * getOrder - Determine Order of fields
+     */
+    function getOrder($row, $type) {
+        $ak = array();
+        if (is_array($row)) {
+            switch ($type) {
+                case '1':
+                    foreach($row as $k => $v) {
+                        $ak[$k] = $v;
+                    }
+                    break;
+                case '2':
+                    foreach($row as $k => $v) {
+                        $ak[$k] = $v;
+                    }
+                    break;
+                case '3':
+                    foreach($row as $k => $v) {
+                        $ak[$k] = $v;
+                    }
+                    break;
+            }
+        }
+        return $ak;
+    }
+
 }
 ?>
