@@ -12,6 +12,8 @@ class Reader {
     var $token = null;
     var $fname = null;
     var $url = null;
+    var $pin = null;
+
     /*
      *  Constructor - autoloads variables needed for class
      */
@@ -244,7 +246,7 @@ class Reader {
      */
     function parseCSV($source) {
         $row = 1;
-        $a = 0;
+        $z = 0;
         $log = null;
         $jump = null;
         $iloc = "Inst";
@@ -258,89 +260,89 @@ class Reader {
                 case 1:
                     // Assessment Data
                     while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-                        if ($a == 0) {
-                            $ak = $this->getOrder($data, 1);
+                        if ($z == 0) {
+                            $i = $this->getOrder($data, 1);
                         } else {
-                            $send['pin'] = $data[0];
-                            $send['device_id'] = $data[1];
-                            $send['assessment_name'] = $data[2];
-                            $send['instr_order'] = $data[3];
-                            $send['inst_sctn'] = $data[4];
-                            $send['itm_ordr'] = $data[5];
-                            $send['inst'] = $data[6];
-                            $send['locale'] = $data[7];
-                            $send['item_id'] = $data[8];
-                            $send['response'] = $data[9];
-                            $send['score'] = $data[10];
-                            $send['theta'] = $data[11];
-                            $send['tscore'] = $data[12];
-                            $send['se'] = $data[13];
-                            $send['data_type'] = $data[14];
-                            $send['position'] = $data[15];
-                            $send['response_time'] = $data[16];
-                            $send['date_created'] = $data[17];
-                            $send['inst_start'] = $data[18];
-                            $send['inst_ended'] = $data[19];
+                            $send['pin'] = $data[$i[0]];
+                            $send['device_id'] = $data[$i[1]];
+                            $send['assessment_name'] = $data[$i[2]];
+                            $send['instr_order'] = $data[$i[3]];
+                            $send['inst_sctn'] = $data[$i[4]];
+                            $send['itm_ordr'] = $data[$i[5]];
+                            $send['inst'] = $data[$i[6]];
+                            $send['locale'] = $data[$i[7]];
+                            $send['item_id'] = $data[$i[8]];
+                            $send['response'] = $data[$i[9]];
+                            $send['score'] = $data[$i[10]];
+                            $send['theta'] = $data[$i[11]];
+                            $send['tscore'] = $data[$i[12]];
+                            $send['se'] = $data[$i[13]];
+                            $send['data_type'] = $data[$i[14]];
+                            $send['position'] = $data[$i[15]];
+                            $send['response_time'] = $data[$i[16]];
+                            $send['date_created'] = $data[$i[17]];
+                            $send['inst_start'] = $data[$i[18]];
+                            $send['inst_ended'] = $data[$i[19]];
                         }
-                        $a++;
+                        $z++;
                     }
                     break;
                 case 2:
                     //  Assessment Scores
                     while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-                        if ($a == 0) {
-                            $ak = $this->getOrder($data, 2);
+                        if ($z == 0) {
+                            $i = $this->getOrder($data, 2);
                         } else {
-                            $send['scr_pin'] = $data[0];
-                            $send['scr_device'] = $data[1];
-                            $send['scr_name'] = $data[2];
-                            $send['scr_inst'] = $data[3];
-                            $send['scr_raw'] = $data[4];
-                            $send['scr_theta'] = $data[5];
-                            $send['scr_tscore'] = $data[6];
-                            $send['scr_se'] = $data[7];
-                            $send['scr_item_count'] = $data[8];
-                            $send['scr_finished'] = $data[9];
-                            $send['scr_col_1'] = $data[10];
-                            $send['scr_col_2'] = $data[11];
-                            $send['scr_col_3'] = $data[12];
-                            $send['scr_col_4'] = $data[13];
-                            $send['scr_col_5'] = $data[14];
-                            $send['scr_language'] = $data[15];
-                            $send['scr_comp_score'] = $data[16];
-                            $send['scr_standard_score'] = $data[17];
-                            $send['scr_age_score'] = $data[18];
-                            $send['scr_corrected_tscore'] = $data[19];
-                            $send['scr_breakoff'] = $data[20];
-                            $send['scr_status_2'] = $data[21];
-                            $send['scr_reason'] = $data[22];
-                            $send['scr_reason_other'] = $data[23];
+                            $send['scr_pin'] = $data[$i[0]];
+                            $send['scr_device'] = $data[$i[1]];
+                            $send['scr_name'] = $data[$i[2]];
+                            $send['scr_inst'] = $data[$i[3]];
+                            $send['scr_raw'] = $data[$i[4]];
+                            $send['scr_theta'] = $data[$i[5]];
+                            $send['scr_tscore'] = $data[$i[6]];
+                            $send['scr_se'] = $data[$i[7]];
+                            $send['scr_item_count'] = $data[$i[8]];
+                            $send['scr_finished'] = $data[$i[9]];
+                            $send['scr_col_1'] = $data[$i[10]];
+                            $send['scr_col_2'] = $data[$i[11]];
+                            $send['scr_col_3'] = $data[$i[12]];
+                            $send['scr_col_4'] = $data[$i[13]];
+                            $send['scr_col_5'] = $data[$i[14]];
+                            $send['scr_language'] = $data[$i[15]];
+                            $send['scr_comp_score'] = $data[$i[16]];
+                            $send['scr_standard_score'] = $data[$i[17]];
+                            $send['scr_age_score'] = $data[$i[18]];
+                            $send['scr_corrected_tscore'] = $data[$i[19]];
+                            $send['scr_breakoff'] = $data[$i[20]];
+                            $send['scr_status_2'] = $data[$i[21]];
+                            $send['scr_reason'] = $data[$i[22]];
+                            $send['scr_reason_other'] = $data[$i[23]];
                         }
-                        $a++;
+                        $z++;
                     }
                     break;
                 case 3:
                     // Registration Data
                     while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-                        if ($a == 0) {
-                            $ak = $this->getOrder($data, 3);
+                        if ($z == 0) {
+                            $i = $this->getOrder($data, 3);
+                            var_dump($i);
                         } else {
-                            var_dump($data);
-                            $send['reg_pin'] = $data[0];
-                            $send['reg_device'] = $data[1];
-                            $send['reg_name'] = $data[2];
-                            $send['reg_age'] = $data[3];
-                            $send['reg_educate'] = $data[4];
-                            $send['reg_mother'] = $data[5];
-                            $send['reg_father'] = $data[6];
-                            $send['reg_guardian'] = $data[7];
-                            $send['reg_starting'] = $data[8];
-                            $send['reg_gender'] = $data[9];
-                            $send['reg_hand'] = $data[10];
-                            $send['reg_race'] = $data[11];
-                            $send['reg_etnicity'] = $data[12];
+                            $send['reg_pin'] = $data[$i[0]];
+                            $send['reg_device'] = $data[$i[1]];
+                            $send['reg_name'] = $data[$i[2]];
+                            $send['reg_age'] = $data[$i[3]];
+                            $send['reg_educate'] = $data[$i[4]];
+                            $send['reg_mother'] = $data[$i[5]];
+                            $send['reg_father'] = $data[$i[6]];
+                            $send['reg_guardian'] = $data[$i[7]];
+                            $send['reg_starting'] = $data[$i[8]];
+                            $send['reg_gender'] = $data[$i[9]];
+                            $send['reg_hand'] = $data[$i[10]];
+                            $send['reg_race'] = $data[$i[11]];
+                            $send['reg_etnicity'] = $data[$i[12]];
                         }
-                        $a++;
+                        $z++;
                     }
                     break;
             }
@@ -348,6 +350,8 @@ class Reader {
         }
         if ($type > 0) {
             $send['redcap_event_name'] = 'baseline_arm_1';
+            echo '<p> AK:';
+            print_r($ak);
             $rec = json_encode($send);
             $send = '['.$rec.']';
             echo $send;
@@ -360,28 +364,203 @@ class Reader {
      * getOrder - Determine Order of fields
      */
     function getOrder($row, $type) {
+        $x = 0;
         $ak = array();
         if (is_array($row)) {
             switch ($type) {
                 case '1':
-                    foreach($row as $k => $v) {
-                        $ak[$k] = $v;
+                foreach($row as $k => $v) {
+                    switch ($v) {
+                        case 'PIN':
+                            $i[0] = $x;
+                            break;
+                        case 'DeviceID':
+                            $i[1] = $x;
+                            break;
+                        case 'Assessment Name':
+                            $i[2] = $x;
+                            break;
+                        case 'InstOrdr':
+                            $i[3] = $x;
+                            break;
+                        case 'InstSctn':
+                            $i[4] = $x;
+                            break;
+                        case 'Inst':
+                            $i[5] = $x;
+                            break;
+                        case 'Locale':
+                            $i[6] = $x;
+                            break;
+                        case 'ItemID':
+                            $i[7] = $x;
+                            break;
+                        case 'Response':
+                            $i[8] = $x;
+                            break;
+                        case 'Score':
+                            $i[9] = $x;
+                            break;
+                        case 'Theta':
+                            $i[10] = $x;
+                            break;
+                        case 'TScore':
+                            $i[11] = $x;
+                            break;
+                        case 'SE':
+                            $i[12] = $x;
+                            break;
+                        case 'DataType':
+                            $i[7] = $x;
+                            break;
+                        case 'Position':
+                            $i[8] = $x;
+                            break;
+                        case 'ResponseTime':
+                            $i[9] = $x;
+                            break;
+                        case 'DateCreated':
+                            $i[10] = $x;
+                            break;
+                        case 'InstStarted':
+                            $i[11] = $x;
+                            break;
+                        case 'InstEnded':
+                            $i[12] = $x;
+                            break;
                     }
-                    break;
-                case '2':
-                    foreach($row as $k => $v) {
-                        $ak[$k] = $v;
-                    }
-                    break;
-                case '3':
-                    foreach($row as $k => $v) {
-                        $ak[$k] = $v;
-                    }
-                    break;
+                    $x++;
             }
+            break;
+            case '2':
+                foreach($row as $k => $v) {
+                    switch ($v) {
+                        case 'PIN':
+                            $i[0] = $x;
+                            break;
+                        case 'DeviceID':
+                            $i[1] = $x;
+                            break;
+                        case 'Assessment Name':
+                            $i[2] = $x;
+                            break;
+                        case 'Inst':
+                            $i[3] = $x;
+                            break;
+                        case 'RawScore':
+                            $i[4] = $x;
+                            break;
+                        case 'Theta':
+                            $i[5] = $x;
+                            break;
+                        case 'TScore':
+                            $i[6] = $x;
+                            break;
+                        case 'SE':
+                            $i[7] = $x;
+                            break;
+                        case 'ItmCnt':
+                            $i[8] = $x;
+                            break;
+                        case 'DateFinished':
+                            $i[9] = $x;
+                            break;
+                        case 'Column1':
+                            $i[10] = $x;
+                            break;
+                        case 'Column2':
+                            $i[11] = $x;
+                            break;
+                        case 'Column3':
+                            $i[12] = $x;
+                            break;
+                        case 'Column4':
+                            $i[13] = $x;
+                            break;
+                        case 'Column5':
+                            $i[14] = $x;
+                            break;
+                        case 'Language':
+                            $i[15] = $x;
+                            break;
+                        case 'Computed Score':
+                            $i[16] = $x;
+                            break;
+                        case 'Uncorrected Standard Score':
+                            $i[17] = $x;
+                            break;
+                        case 'Age-Corrected Standard Score':
+                            $i[18] = $x;
+                            break;
+                        case 'Fully-Corrected T-score':
+                            $i[19] = $x;
+                            break;
+                        case 'InstrumentBreakoff':
+                            $i[20] = $x;
+                            break;
+                        case 'InstrumentStatus2':
+                            $i[21] = $x;
+                            break;
+                        case 'InstrumentRCReason':
+                            $i[22] = $x;
+                            break;
+                        case 'InstrumentRCReasonOther':
+                            $i[23] = $x;
+                            break;
+                    }
+                    $x++;
+                }
+                break;
+            case '3':
+                foreach($row as $k => $v) {
+                    switch ($v) {
+                        case 'PIN':
+                            $i[0] = $x;
+                            break;
+                        case 'DeviceID':
+                            $i[1] = $x;
+                            break;
+                        case 'Name':
+                            $i[2] = $x;
+                            break;
+                        case 'Age':
+                            $i[3] = $x;
+                            break;
+                        case 'Education':
+                            $i[4] = $x;
+                            break;
+                        case 'MothersEducation':
+                            $i[5] = $x;
+                            break;
+                        case 'FathersEducation':
+                            $i[6] = $x;
+                            break;
+                        case 'GuardiansEducation':
+                            $i[7] = $x;
+                            break;
+                        case 'StartingLevelOverride':
+                            $i[8] = $x;
+                            break;
+                        case 'Gender':
+                            $i[9] = $x;
+                            break;
+                        case 'Handedness':
+                            $i[10] = $x;
+                            break;
+                        case 'Race':
+                            $i[11] = $x;
+                            break;
+                        case 'Ethnicity':
+                            $i[12] = $x;
+                            break;
+                    }
+                    $x++;
+                }
+                break;
         }
-        return $ak;
     }
+    return $ak;
+}
 
 }
 ?>
